@@ -1,45 +1,41 @@
+// pages/loginPage.jsx
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 
 export default function LoginPage() {
-  const [email, setEmail] = useState("");
+  const [email,    setEmail]    = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
+  const [error,    setError]    = useState("");
+  const [loading,  setLoading]  = useState(false);
+  const navigate  = useNavigate();
+  const location  = useLocation();
+
+  // Shows green banner when coming from successful registration
+  const successMsg = location.state?.message;
 
   const handleLogin = async () => {
     setError("");
-
     if (!email || !password) {
       setError("Please enter both email and password.");
       return;
     }
-
     setLoading(true);
     try {
-      const res = await axios.post(import.meta.env.VITE_BACKEND_URL+"/api/users/login", {
-        email,
-        password,
-      });
-
+      const res = await axios.post(
+        import.meta.env.VITE_BACKEND_URL + "/api/users/login",
+        { email, password }
+      );
       const { token, user } = res.data;
-
-      // Store token and user info
       localStorage.setItem("token", token);
       localStorage.setItem("user", JSON.stringify(user));
-
-      // Redirect based on role
       if (user.role === "admin") {
         navigate("/admin");
       } else {
         navigate("/");
       }
     } catch (err) {
-      const msg =
-        err.response?.data?.message || "Login failed. Please try again.";
-      setError(msg);
+      setError(err.response?.data?.message || "Login failed. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -55,6 +51,12 @@ export default function LoginPage() {
         <h1 className="text-2xl font-bold mb-6 text-center text-gray-800">
           Sign In
         </h1>
+
+        {successMsg && (
+          <div className="mb-4 px-4 py-2 bg-green-100 border border-green-300 text-green-700 rounded text-sm">
+            {successMsg}
+          </div>
+        )}
 
         {error && (
           <div className="mb-4 px-4 py-2 bg-red-100 border border-red-300 text-red-700 rounded text-sm">
@@ -93,6 +95,16 @@ export default function LoginPage() {
         >
           {loading ? "Signing in…" : "Login"}
         </button>
+
+        <p className="text-center text-sm text-gray-500 mt-4">
+          Don't have an account?{" "}
+          <span
+            onClick={() => navigate("/register")}
+            className="text-blue-500 cursor-pointer hover:underline"
+          >
+            Register
+          </span>
+        </p>
       </div>
     </div>
   );

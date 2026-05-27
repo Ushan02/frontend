@@ -5,6 +5,7 @@ import HomePage from '../pages/home'
 import LoginPage from '../pages/loginPage'
 import NotFoundPage from '../pages/notFoundPage'
 import AdminPage from '../pages/adminPage'
+import RegisterPage from '../pages/registerPage'
 
 // Protect admin routes — redirect to login if no token or not admin
 function AdminRoute({ children }) {
@@ -24,6 +25,7 @@ function App() {
       <Routes>
         <Route path="/"       element={<HomePage />} />
         <Route path="/login"  element={<LoginPage />} />
+        <Route path="/register"  element={<RegisterPage />} />
         <Route
           path="/admin/*"
           element={
