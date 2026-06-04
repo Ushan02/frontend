@@ -57,7 +57,7 @@ export default function TestingPage() {
   }
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] flex justify-center items-center bg-base-200 p-6">
+    <div className="flex flex-1 justify-center items-center bg-base-200 p-6">
       <div className="card w-full max-w-md bg-base-100 shadow-xl">
         <div className="card-body">
           <h2 className="card-title">Supabase Storage Test</h2>

@@ -1,22 +1,28 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
-import { HiOutlineShoppingBag, HiOutlineMagnifyingGlass } from "react-icons/hi2";
+import { HiOutlineShoppingBag, HiOutlineMagnifyingGlass, HiOutlineShoppingCart } from "react-icons/hi2";
+import { useCart } from "../src/context/CartContext";
 
 const API = import.meta.env.VITE_BACKEND_URL + "/api/products";
 
 function ProductCard({ product }) {
+  const { addToCart } = useCart();
   const image = product.images?.[0];
   const onSale = Number(product.labeledPrice) > Number(product.price);
   const discount = onSale
     ? Math.round((1 - product.price / product.labeledPrice) * 100)
     : 0;
 
+  const handleQuickAdd = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (product.isAvailable) addToCart(product, 1);
+  };
+
   return (
-    <Link
-      to={`/products/${product.productId}`}
-      className="group card bg-base-100 shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden border border-base-200/80 hover:-translate-y-1"
-    >
+    <div className="group card bg-base-100 shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden border border-base-200/80 hover:-translate-y-1">
+    <Link to={`/products/${product.productId}`} className="block">
       <figure className="relative aspect-[4/3] bg-base-200 overflow-hidden">
         {image ? (
           <img
@@ -40,6 +46,7 @@ function ProductCard({ product }) {
           </span>
         )}
       </figure>
+    </Link>
 
       <div className="card-body p-5 gap-2">
         <p className="text-xs text-base-content/50 font-mono uppercase tracking-wide">
@@ -56,7 +63,7 @@ function ProductCard({ product }) {
         <p className="text-sm text-base-content/60 line-clamp-2 flex-1">
           {product.descriptions}
         </p>
-        <div className="flex items-end justify-between pt-2 mt-auto">
+        <div className="flex items-end justify-between pt-2 mt-auto gap-2">
           <div>
             {onSale && (
               <p className="text-sm text-base-content/40 line-through">
@@ -67,10 +74,23 @@ function ProductCard({ product }) {
               ${Number(product.price).toFixed(2)}
             </p>
           </div>
-          <span className="btn btn-primary btn-sm">View</span>
+          <div className="flex gap-1">
+            <button
+              type="button"
+              onClick={handleQuickAdd}
+              disabled={!product.isAvailable}
+              className="btn btn-primary btn-sm btn-square"
+              title="Add to cart"
+            >
+              <HiOutlineShoppingCart className="w-4 h-4" />
+            </button>
+            <Link to={`/products/${product.productId}`} className="btn btn-outline btn-sm">
+              View
+            </Link>
+          </div>
         </div>
       </div>
-    </Link>
+    </div>
   );
 }
 
@@ -119,7 +139,7 @@ export default function ProductsPage() {
   }, [search, products]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-base-200/50 to-base-100">
+    <div className="flex-1 bg-gradient-to-b from-base-200/50 to-base-100">
       {/* Hero */}
       <section className="bg-gradient-to-r from-primary to-blue-700 text-primary-content py-14 px-6">
         <div className="max-w-6xl mx-auto text-center">

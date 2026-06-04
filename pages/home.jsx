@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 
 export default function HomePage() {
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="flex-1 bg-gray-100">
 
       {/* Hero Section */}
       <section className="flex flex-col justify-center items-center text-center py-20 bg-blue-600 text-white">

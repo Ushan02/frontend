@@ -1,20 +1,30 @@
 import { useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import {
   HiOutlineArrowLeft,
   HiOutlineShoppingBag,
   HiOutlineTag,
+  HiOutlineShoppingCart,
+  HiOutlineMinus,
+  HiOutlinePlus,
+  HiOutlineCheck,
+  HiOutlineBolt,
 } from "react-icons/hi2";
+import { useCart } from "../src/context/CartContext";
 
 const API = import.meta.env.VITE_BACKEND_URL + "/api/products";
 
 export default function ProductDetailPage() {
   const { productId } = useParams();
+  const navigate = useNavigate();
+  const { addToCart } = useCart();
   const [product, setProduct] = useState(null);
   const [activeImage, setActiveImage] = useState(0);
+  const [quantity, setQuantity] = useState(1);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [cartMsg, setCartMsg] = useState("");
 
   useEffect(() => {
     async function fetchProduct() {
@@ -61,8 +71,35 @@ export default function ProductDetailPage() {
     ? Math.round((1 - product.price / product.labeledPrice) * 100)
     : 0;
 
+  const handleAddToCart = () => {
+    if (!product.isAvailable) {
+      setCartMsg("This product is currently unavailable.");
+      return;
+    }
+    const result = addToCart(product, quantity);
+    if (result.ok) {
+      setCartMsg(`Added ${quantity} to cart!`);
+      setTimeout(() => setCartMsg(""), 3000);
+    } else {
+      setCartMsg(result.message);
+    }
+  };
+
+  const handleBuyNow = () => {
+    if (!product.isAvailable) {
+      setCartMsg("This product is currently unavailable.");
+      return;
+    }
+    const result = addToCart(product, quantity);
+    if (result.ok) {
+      navigate("/cart");
+    } else {
+      setCartMsg(result.message);
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-b from-base-200/40 to-base-100">
+    <div className="flex-1 bg-gradient-to-b from-base-200/40 to-base-100">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8">
         <Link
           to="/products"
@@ -151,13 +188,70 @@ export default function ProductDetailPage() {
               {product.descriptions}
             </p>
 
-            <div className="mt-8 pt-6 border-t border-base-200 flex flex-col sm:flex-row gap-3">
-              <button type="button" className="btn btn-primary btn-lg flex-1">
+            {product.isAvailable && (
+              <div className="flex items-center gap-3 mt-6">
+                <span className="text-sm font-medium text-base-content/70">Quantity</span>
+                <div className="flex items-center border border-base-300 rounded-lg">
+                  <button
+                    type="button"
+                    className="btn btn-ghost btn-sm btn-square"
+                    onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+                  >
+                    <HiOutlineMinus className="w-4 h-4" />
+                  </button>
+                  <span className="w-10 text-center font-medium">{quantity}</span>
+                  <button
+                    type="button"
+                    className="btn btn-ghost btn-sm btn-square"
+                    onClick={() => setQuantity((q) => q + 1)}
+                  >
+                    <HiOutlinePlus className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {cartMsg && (
+              <div
+                className={`alert mt-4 py-2 text-sm ${
+                  cartMsg.includes("Added") ? "alert-success" : "alert-warning"
+                }`}
+              >
+                {cartMsg.includes("Added") && (
+                  <HiOutlineCheck className="w-5 h-5 shrink-0" />
+                )}
+                <span>{cartMsg}</span>
+                {cartMsg.includes("Added") && (
+                  <button
+                    type="button"
+                    className="btn btn-sm btn-ghost"
+                    onClick={() => navigate("/cart")}
+                  >
+                    View cart
+                  </button>
+                )}
+              </div>
+            )}
+
+            <div className="mt-6 pt-6 border-t border-base-200 flex flex-col sm:flex-row gap-3">
+              <button
+                type="button"
+                onClick={handleAddToCart}
+                disabled={!product.isAvailable}
+                className="btn btn-primary btn-lg flex-1 gap-2"
+              >
+                <HiOutlineShoppingCart className="w-5 h-5" />
                 Add to Cart
               </button>
-              <Link to="/products" className="btn btn-outline btn-lg">
-                Continue Shopping
-              </Link>
+              <button
+                type="button"
+                onClick={handleBuyNow}
+                disabled={!product.isAvailable}
+                className="btn btn-outline btn-lg flex-1 gap-2"
+              >
+                <HiOutlineBolt className="w-5 h-5" />
+                Buy Now
+              </button>
             </div>
 
             <p className="text-xs text-base-content/40 mt-4">

@@ -6,6 +6,7 @@ import {
   HiOutlineLockClosed,
   HiOutlineArrowRightOnRectangle,
 } from "react-icons/hi2";
+import { useCart } from "../src/context/CartContext";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -14,6 +15,7 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
+  const { reloadCart } = useCart();
 
   const successMsg = location.state?.message;
 
@@ -32,6 +34,7 @@ export default function LoginPage() {
       const { token, user } = res.data;
       localStorage.setItem("token", token);
       localStorage.setItem("user", JSON.stringify(user));
+      reloadCart();
       if (user.role === "admin") {
         navigate("/admin");
       } else {
@@ -49,7 +52,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex flex-col justify-center items-center min-h-screen bg-gray-100">
+    <div className="flex flex-1 flex-col justify-center items-center bg-gray-100">
       <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-sm">
         <h1 className="text-2xl font-bold mb-6 text-center text-gray-800 flex items-center justify-center gap-2">
           <HiOutlineArrowRightOnRectangle className="w-7 h-7 text-blue-500" />

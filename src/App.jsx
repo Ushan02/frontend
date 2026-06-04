@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, Navigate, Outlet } from 'react-router-dom'
 import './App.css'
 import Header from '../components/header'
 import HomePage from '../pages/home'
@@ -9,6 +9,8 @@ import RegisterPage from '../pages/registerPage'
 import TestingPage from '../pages/testingPage'
 import ProductsPage from '../pages/productsPage'
 import ProductDetailPage from '../pages/productDetailPage'
+import CartPage from '../pages/cartPage'
+import { CartProvider } from './context/CartContext'
 
 // Safely parse stored user
 function getStoredUser() {
@@ -43,27 +45,42 @@ function GuestRoute({ children }) {
   return children;
 }
 
+function PageLayout() {
+  return (
+    <main className="flex-1 flex flex-col min-h-0">
+      <Outlet />
+    </main>
+  );
+}
+
 function App() {
   return (
     <BrowserRouter>
-      <Header />
-      <Routes>
-        <Route path="/"        element={<HomePage />} />
-        <Route path="/products" element={<ProductsPage />} />
-        <Route path="/products/:productId" element={<ProductDetailPage />} />
-        <Route path="/testing" element={<TestingPage />} />
-        <Route path="/login"   element={<GuestRoute><LoginPage /></GuestRoute>} />
-        <Route path="/register" element={<GuestRoute><RegisterPage /></GuestRoute>} />
-        <Route
-          path="/admin/*"
-          element={
-            <AdminRoute>
-              <AdminPage />
-            </AdminRoute>
-          }
-        />
-        <Route path="*" element={<NotFoundPage />} />
-      </Routes>
+      <CartProvider>
+      <div className="min-h-screen flex flex-col">
+        <Header />
+        <Routes>
+          <Route
+            path="/admin/*"
+            element={
+              <AdminRoute>
+                <AdminPage />
+              </AdminRoute>
+            }
+          />
+          <Route element={<PageLayout />}>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/products" element={<ProductsPage />} />
+            <Route path="/products/:productId" element={<ProductDetailPage />} />
+            <Route path="/cart" element={<CartPage />} />
+            <Route path="/testing" element={<TestingPage />} />
+            <Route path="/login" element={<GuestRoute><LoginPage /></GuestRoute>} />
+            <Route path="/register" element={<GuestRoute><RegisterPage /></GuestRoute>} />
+            <Route path="*" element={<NotFoundPage />} />
+          </Route>
+        </Routes>
+      </div>
+      </CartProvider>
     </BrowserRouter>
   )
 }

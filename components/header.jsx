@@ -7,7 +7,9 @@ import {
   HiOutlineUserPlus,
   HiOutlineBeaker,
   HiOutlineShoppingBag,
+  HiOutlineShoppingCart,
 } from "react-icons/hi2";
+import { useCart } from "../src/context/CartContext";
 
 function getStoredUser() {
   try {
@@ -33,15 +35,17 @@ function NavLinkItem({ to, children, icon: Icon, className = "" }) {
 export default function Header() {
   const navigate = useNavigate();
   const user = getStoredUser();
+  const { cartCount, reloadCart } = useCart();
 
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
+    reloadCart();
     navigate("/login");
   };
 
   return (
-    <header className="flex items-center justify-between px-8 py-4 bg-blue-600 text-white shadow-md">
+    <header className="sticky top-0 z-50 shrink-0 h-16 flex items-center justify-between px-4 sm:px-8 bg-blue-600 text-white shadow-md">
       <div className="text-xl font-bold">
         <Link to="/" className="hover:text-blue-200 transition flex items-center gap-2">
           <HiOutlineHome className="w-5 h-5" />
@@ -49,14 +53,28 @@ export default function Header() {
         </Link>
       </div>
 
-      <nav className="flex gap-6 items-center">
+      <nav className="flex gap-4 sm:gap-6 items-center">
         <NavLinkItem to="/" icon={HiOutlineHome}>
           Home
         </NavLinkItem>
         <NavLinkItem to="/products" icon={HiOutlineShoppingBag}>
           Products
         </NavLinkItem>
-        <NavLinkItem to="/testing" icon={HiOutlineBeaker}>
+
+        <Link
+          to="/cart"
+          className="relative hover:text-blue-200 font-medium transition flex items-center gap-1.5"
+        >
+          <HiOutlineShoppingCart className="w-5 h-5" />
+          <span className="hidden sm:inline">Cart</span>
+          {cartCount > 0 && (
+            <span className="absolute -top-2 -right-2 sm:static sm:ml-0 min-w-[1.25rem] h-5 px-1 flex items-center justify-center rounded-full bg-white text-blue-600 text-xs font-bold">
+              {cartCount > 99 ? "99+" : cartCount}
+            </span>
+          )}
+        </Link>
+
+        <NavLinkItem to="/testing" icon={HiOutlineBeaker} className="hidden md:flex">
           Testing
         </NavLinkItem>
 
@@ -67,13 +85,15 @@ export default function Header() {
                 Admin
               </NavLinkItem>
             )}
-            <span className="text-blue-100 text-sm">Hi, {user.firstName}</span>
+            <span className="text-blue-100 text-sm hidden lg:inline">
+              Hi, {user.firstName}
+            </span>
             <button
               onClick={handleLogout}
               className="bg-white text-blue-600 px-3 py-1 rounded font-medium text-sm hover:bg-blue-50 transition flex items-center gap-1.5"
             >
               <HiOutlineArrowRightOnRectangle className="w-4 h-4" />
-              Logout
+              <span className="hidden sm:inline">Logout</span>
             </button>
           </>
         ) : (
