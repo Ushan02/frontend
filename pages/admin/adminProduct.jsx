@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
+import { HiOutlinePlus, HiOutlinePencil, HiOutlineTrash } from "react-icons/hi2";
 
 const API = import.meta.env.VITE_BACKEND_URL + "/api/products";
 
@@ -84,8 +85,9 @@ export default function AdminProduct() {
         </div>
         <Link
           to="/admin/products/add"
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition shadow-sm"
+          className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition shadow-sm flex items-center gap-2"
         >
+          <HiOutlinePlus className="w-4 h-4" />
           Add Product
         </Link>
       </div>
@@ -158,13 +160,18 @@ export default function AdminProduct() {
                   </td>
                   <td className="px-5 py-3.5">
                     <div className="flex gap-3">
-                      <button className="text-blue-600 hover:text-blue-800 text-sm font-medium">
+                      <Link
+                        to={`/admin/products/edit/${product.productId}`}
+                        className="text-blue-600 hover:text-blue-800 text-sm font-medium flex items-center gap-1"
+                      >
+                        <HiOutlinePencil className="w-4 h-4" />
                         Edit
-                      </button>
+                      </Link>
                       <button
                         onClick={() => handleDelete(product.productId)}
-                        className="text-red-600 hover:text-red-800 text-sm font-medium"
+                        className="text-red-600 hover:text-red-800 text-sm font-medium flex items-center gap-1"
                       >
+                        <HiOutlineTrash className="w-4 h-4" />
                         Delete
                       </button>
                     </div>

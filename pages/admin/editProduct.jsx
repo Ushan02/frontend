@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import { HiOutlineArrowLeft, HiOutlinePhoto } from "react-icons/hi2";
 import {
@@ -17,26 +17,50 @@ function getAuthHeaders() {
   return token ? { Authorization: `Bearer ${token}` } : {};
 }
 
-const initialForm = {
-  productId: "",
-  productName: "",
-  altNames: "",
-  descriptions: "",
-  labeledPrice: "",
-  price: "",
-  isAvailable: true,
-};
-
-export default function AddProduct() {
+export default function EditProduct() {
+  const { productId } = useParams();
   const navigate = useNavigate();
-  const [form, setForm] = useState(initialForm);
-  const [imageItems, setImageItems] = useState([]);
+
+  const [form, setForm] = useState({
+    productName: "",
+    altNames: "",
+    descriptions: "",
+    labeledPrice: "",
+    price: "",
+    isAvailable: true,
+  });
+  const [existingImages, setExistingImages] = useState([]);
+  const [newImageItems, setNewImageItems] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
 
-  const revokeAllPreviews = (items) => {
-    items.forEach((item) => URL.revokeObjectURL(item.preview));
-  };
+  useEffect(() => {
+    async function loadProduct() {
+      setLoading(true);
+      setError("");
+      try {
+        const res = await axios.get(`${API}/${productId}`, {
+          headers: getAuthHeaders(),
+        });
+        const p = res.data;
+        setForm({
+          productName: p.productName ?? "",
+          altNames: Array.isArray(p.altNames) ? p.altNames.join(", ") : "",
+          descriptions: p.descriptions ?? "",
+          labeledPrice: String(p.labeledPrice ?? ""),
+          price: String(p.price ?? ""),
+          isAvailable: Boolean(p.isAvailable),
+        });
+        setExistingImages(Array.isArray(p.images) ? [...p.images] : []);
+      } catch (err) {
+        setError(err.response?.data?.message || "Failed to load product.");
+      } finally {
+        setLoading(false);
+      }
+    }
+    if (productId) loadProduct();
+  }, [productId]);
 
   const update = (field, value) => {
     setForm((prev) => ({ ...prev, [field]: value }));
@@ -53,17 +77,21 @@ export default function AddProduct() {
       preview: URL.createObjectURL(file),
     }));
 
-    setImageItems((prev) => [...prev, ...newItems]);
+    setNewImageItems((prev) => [...prev, ...newItems]);
     setError("");
     e.target.value = "";
   };
 
-  const removeImage = (id) => {
-    setImageItems((prev) => {
+  const removeNewImage = (id) => {
+    setNewImageItems((prev) => {
       const item = prev.find((i) => i.id === id);
       if (item) URL.revokeObjectURL(item.preview);
       return prev.filter((i) => i.id !== id);
     });
+  };
+
+  const removeExistingImage = (url) => {
+    setExistingImages((prev) => prev.filter((u) => u !== url));
   };
 
   async function uploadImages(files) {
@@ -72,7 +100,6 @@ export default function AddProduct() {
     }
 
     const urls = [];
-
     for (const file of files) {
       const filePath = uniqueImagePath(file.name, "products");
       const { error: uploadError } = await supabase.storage
@@ -81,13 +108,10 @@ export default function AddProduct() {
           upsert: false,
           contentType: file.type || "image/jpeg",
         });
-
       if (uploadError) throw uploadError;
-
       const { data } = supabase.storage.from(BUCKET).getPublicUrl(filePath);
       urls.push(data.publicUrl);
     }
-
     return urls;
   }
 
@@ -95,27 +119,29 @@ export default function AddProduct() {
     e.preventDefault();
     setError("");
 
-    const { productId, productName, descriptions, labeledPrice, price } = form;
-    if (!productId.trim() || !productName.trim() || !descriptions.trim()) {
-      setError("Product ID, name, and description are required.");
+    const { productName, descriptions, labeledPrice, price } = form;
+    if (!productName.trim() || !descriptions.trim()) {
+      setError("Product name and description are required.");
       return;
     }
     if (!labeledPrice || !price) {
       setError("Labeled price and price are required.");
       return;
     }
-    if (imageItems.length === 0) {
-      setError("Please upload at least one product image.");
+
+    const totalImages = existingImages.length + newImageItems.length;
+    if (totalImages === 0) {
+      setError("At least one product image is required.");
       return;
     }
 
     setSubmitting(true);
 
     try {
-      const images = await uploadImages(imageItems.map((i) => i.file));
+      const newUrls = await uploadImages(newImageItems.map((i) => i.file));
+      const images = [...existingImages, ...newUrls];
 
       const payload = {
-        productId: productId.trim(),
         productName: productName.trim(),
         altNames: form.altNames
           .split(",")
@@ -128,20 +154,44 @@ export default function AddProduct() {
         isAvailable: form.isAvailable,
       };
 
-      await axios.post(API, payload, { headers: getAuthHeaders() });
-      revokeAllPreviews(imageItems);
+      await axios.put(`${API}/${productId}`, payload, { headers: getAuthHeaders() });
+      newImageItems.forEach((item) => URL.revokeObjectURL(item.preview));
       navigate("/admin/products");
     } catch (err) {
       const msg =
         err.response?.data?.error ||
         err.response?.data?.message ||
         err.message ||
-        "Failed to add product.";
+        "Failed to update product.";
       setError(getStorageHint(msg) ? `${msg} — ${getStorageHint(msg)}` : msg);
     } finally {
       setSubmitting(false);
     }
   }
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center py-24 text-slate-400 text-sm">
+        Loading product…
+      </div>
+    );
+  }
+
+  if (error && !form.productName) {
+    return (
+      <div className="p-8 max-w-3xl mx-auto">
+        <div className="px-4 py-3 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm mb-4">
+          {error}
+        </div>
+        <Link to="/admin/products" className="text-blue-600 text-sm hover:underline flex items-center gap-1">
+          <HiOutlineArrowLeft className="w-4 h-4" />
+          Back to products
+        </Link>
+      </div>
+    );
+  }
+
+  const allImageCount = existingImages.length + newImageItems.length;
 
   return (
     <div className="w-full flex justify-center items-start py-8 px-4 sm:px-6">
@@ -154,8 +204,8 @@ export default function AddProduct() {
             <HiOutlineArrowLeft className="w-4 h-4" />
             Back to products
           </Link>
-          <h1 className="text-2xl font-bold text-slate-800 mt-2">Add Product</h1>
-          <p className="text-slate-500 text-sm mt-1">Create a new product in your store</p>
+          <h1 className="text-2xl font-bold text-slate-800 mt-2">Edit Product</h1>
+          <p className="text-slate-500 text-sm mt-1 font-mono">{productId}</p>
         </div>
 
         <form
@@ -168,37 +218,32 @@ export default function AddProduct() {
             </div>
           )}
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <label className="form-control w-full">
-              <span className="label-text text-slate-600 font-medium">Product ID *</span>
-              <input
-                type="text"
-                placeholder="PRD-009"
-                value={form.productId}
-                onChange={(e) => update("productId", e.target.value)}
-                className="input input-bordered w-full mt-1"
-                required
-              />
-            </label>
+          <label className="form-control w-full">
+            <span className="label-text text-slate-600 font-medium">Product ID</span>
+            <input
+              type="text"
+              value={productId}
+              disabled
+              className="input input-bordered w-full mt-1 bg-slate-50 text-slate-500"
+            />
+          </label>
 
-            <label className="form-control w-full">
-              <span className="label-text text-slate-600 font-medium">Product Name *</span>
-              <input
-                type="text"
-                placeholder="Wireless Headphones"
-                value={form.productName}
-                onChange={(e) => update("productName", e.target.value)}
-                className="input input-bordered w-full mt-1"
-                required
-              />
-            </label>
-          </div>
+          <label className="form-control w-full">
+            <span className="label-text text-slate-600 font-medium">Product Name *</span>
+            <input
+              type="text"
+              value={form.productName}
+              onChange={(e) => update("productName", e.target.value)}
+              className="input input-bordered w-full mt-1"
+              required
+            />
+          </label>
 
           <label className="form-control w-full">
             <span className="label-text text-slate-600 font-medium">Alt Names</span>
             <input
               type="text"
-              placeholder="BT Headphones, Earphones (comma separated)"
+              placeholder="Comma separated"
               value={form.altNames}
               onChange={(e) => update("altNames", e.target.value)}
               className="input input-bordered w-full mt-1"
@@ -208,7 +253,6 @@ export default function AddProduct() {
           <label className="form-control w-full">
             <span className="label-text text-slate-600 font-medium">Description *</span>
             <textarea
-              placeholder="Product description..."
               value={form.descriptions}
               onChange={(e) => update("descriptions", e.target.value)}
               className="textarea textarea-bordered w-full mt-1 min-h-24"
@@ -223,7 +267,6 @@ export default function AddProduct() {
                 type="number"
                 min="0"
                 step="0.01"
-                placeholder="99.99"
                 value={form.labeledPrice}
                 onChange={(e) => update("labeledPrice", e.target.value)}
                 className="input input-bordered w-full mt-1"
@@ -237,7 +280,6 @@ export default function AddProduct() {
                 type="number"
                 min="0"
                 step="0.01"
-                placeholder="79.99"
                 value={form.price}
                 onChange={(e) => update("price", e.target.value)}
                 className="input input-bordered w-full mt-1"
@@ -249,10 +291,10 @@ export default function AddProduct() {
           <div className="form-control w-full">
             <span className="label-text text-slate-600 font-medium flex items-center gap-2">
               <HiOutlinePhoto className="w-4 h-4" />
-              Product Images * ({imageItems.length} selected)
+              Product Images * ({allImageCount} total)
             </span>
             <p className="text-xs text-slate-400 mt-0.5 mb-2">
-              Select multiple images. First image is used as the main thumbnail in the product list.
+              Remove existing images or add new ones. First image is the main thumbnail.
             </p>
             <input
               type="file"
@@ -262,23 +304,48 @@ export default function AddProduct() {
               className="file-input file-input-bordered w-full"
             />
 
-            {imageItems.length > 0 && (
+            {(existingImages.length > 0 || newImageItems.length > 0) && (
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 mt-4">
-                {imageItems.map((item, index) => (
-                  <div key={item.id} className="relative group">
+                {existingImages.map((url, index) => (
+                  <div key={url} className="relative group">
                     <img
-                      src={item.preview}
-                      alt={`Preview ${index + 1}`}
+                      src={url}
+                      alt={`Existing ${index + 1}`}
                       className="w-full aspect-square object-cover rounded-lg border border-slate-200"
                     />
-                    {index === 0 && (
+                    {index === 0 && newImageItems.length === 0 && (
                       <span className="absolute top-1 left-1 badge badge-primary badge-sm">
                         Main
                       </span>
                     )}
                     <button
                       type="button"
-                      onClick={() => removeImage(item.id)}
+                      onClick={() => removeExistingImage(url)}
+                      className="absolute top-1 right-1 btn btn-circle btn-xs btn-error opacity-90"
+                      aria-label="Remove image"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                ))}
+                {newImageItems.map((item, index) => (
+                  <div key={item.id} className="relative group">
+                    <img
+                      src={item.preview}
+                      alt={`New ${index + 1}`}
+                      className="w-full aspect-square object-cover rounded-lg border border-blue-300"
+                    />
+                    {existingImages.length === 0 && index === 0 && (
+                      <span className="absolute top-1 left-1 badge badge-primary badge-sm">
+                        Main
+                      </span>
+                    )}
+                    <span className="absolute bottom-1 left-1 badge badge-sm bg-blue-600 text-white border-0">
+                      New
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => removeNewImage(item.id)}
                       className="absolute top-1 right-1 btn btn-circle btn-xs btn-error opacity-90"
                       aria-label="Remove image"
                     >
@@ -308,7 +375,7 @@ export default function AddProduct() {
                   Saving…
                 </>
               ) : (
-                "Add Product"
+                "Save Changes"
               )}
             </button>
             <Link to="/admin/products" className="btn btn-ghost">

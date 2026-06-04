@@ -1,3 +1,5 @@
+import { Link } from "react-router-dom";
+
 export default function HomePage() {
   return (
     <div className="min-h-screen bg-gray-100">
@@ -6,9 +8,12 @@ export default function HomePage() {
       <section className="flex flex-col justify-center items-center text-center py-20 bg-blue-600 text-white">
         <h1 className="text-4xl font-bold mb-4">Welcome to MyApp</h1>
         <p className="text-lg mb-8 text-blue-100">Your one-stop solution for everything.</p>
-        <button className="bg-white text-blue-600 font-semibold px-6 py-3 rounded-lg hover:bg-blue-50 transition">
-          Get Started
-        </button>
+        <Link
+          to="/products"
+          className="bg-white text-blue-600 font-semibold px-6 py-3 rounded-lg hover:bg-blue-50 transition"
+        >
+          Shop Products
+        </Link>
       </section>
 
       {/* Features Section */}

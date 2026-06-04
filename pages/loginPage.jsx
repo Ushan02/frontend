@@ -1,17 +1,20 @@
-// pages/loginPage.jsx
 import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
+import {
+  HiOutlineEnvelope,
+  HiOutlineLockClosed,
+  HiOutlineArrowRightOnRectangle,
+} from "react-icons/hi2";
 
 export default function LoginPage() {
-  const [email,    setEmail]    = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error,    setError]    = useState("");
-  const [loading,  setLoading]  = useState(false);
-  const navigate  = useNavigate();
-  const location  = useLocation();
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+  const location = useLocation();
 
-  // Shows green banner when coming from successful registration
   const successMsg = location.state?.message;
 
   const handleLogin = async () => {
@@ -48,7 +51,8 @@ export default function LoginPage() {
   return (
     <div className="flex flex-col justify-center items-center min-h-screen bg-gray-100">
       <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-sm">
-        <h1 className="text-2xl font-bold mb-6 text-center text-gray-800">
+        <h1 className="text-2xl font-bold mb-6 text-center text-gray-800 flex items-center justify-center gap-2">
+          <HiOutlineArrowRightOnRectangle className="w-7 h-7 text-blue-500" />
           Sign In
         </h1>
 
@@ -64,40 +68,43 @@ export default function LoginPage() {
           </div>
         )}
 
-        <label className="block text-sm font-medium text-gray-600 mb-1">
-          Email
-        </label>
-        <input
-          type="email"
-          placeholder="you@example.com"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          onKeyDown={handleKeyDown}
-          className="w-full border border-gray-300 rounded px-3 py-2 mb-4 focus:outline-none focus:ring-2 focus:ring-blue-400"
-        />
+        <label className="block text-sm font-medium text-gray-600 mb-1">Email</label>
+        <div className="relative mb-4">
+          <HiOutlineEnvelope className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+          <input
+            type="email"
+            placeholder="you@example.com"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            onKeyDown={handleKeyDown}
+            className="w-full border border-gray-300 rounded pl-10 pr-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+          />
+        </div>
 
-        <label className="block text-sm font-medium text-gray-600 mb-1">
-          Password
-        </label>
-        <input
-          type="password"
-          placeholder="••••••••"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          onKeyDown={handleKeyDown}
-          className="w-full border border-gray-300 rounded px-3 py-2 mb-6 focus:outline-none focus:ring-2 focus:ring-blue-400"
-        />
+        <label className="block text-sm font-medium text-gray-600 mb-1">Password</label>
+        <div className="relative mb-6">
+          <HiOutlineLockClosed className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+          <input
+            type="password"
+            placeholder="••••••••"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            onKeyDown={handleKeyDown}
+            className="w-full border border-gray-300 rounded pl-10 pr-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+          />
+        </div>
 
         <button
           onClick={handleLogin}
           disabled={loading}
-          className="w-full bg-blue-500 hover:bg-blue-600 disabled:bg-blue-300 text-white font-semibold py-2 rounded transition"
+          className="w-full bg-blue-500 hover:bg-blue-600 disabled:bg-blue-300 text-white font-semibold py-2 rounded transition flex items-center justify-center gap-2"
         >
+          <HiOutlineArrowRightOnRectangle className="w-5 h-5" />
           {loading ? "Signing in…" : "Login"}
         </button>
 
         <p className="text-center text-sm text-gray-500 mt-4">
-          Don't have an account?{" "}
+          Don&apos;t have an account?{" "}
           <span
             onClick={() => navigate("/register")}
             className="text-blue-500 cursor-pointer hover:underline"

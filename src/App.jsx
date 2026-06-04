@@ -7,6 +7,8 @@ import NotFoundPage from '../pages/notFoundPage'
 import AdminPage from '../pages/adminPage'
 import RegisterPage from '../pages/registerPage'
 import TestingPage from '../pages/testingPage'
+import ProductsPage from '../pages/productsPage'
+import ProductDetailPage from '../pages/productDetailPage'
 
 // Safely parse stored user
 function getStoredUser() {
@@ -47,7 +49,9 @@ function App() {
       <Header />
       <Routes>
         <Route path="/"        element={<HomePage />} />
-        <Route path="/testing"        element={<TestingPage />} />
+        <Route path="/products" element={<ProductsPage />} />
+        <Route path="/products/:productId" element={<ProductDetailPage />} />
+        <Route path="/testing" element={<TestingPage />} />
         <Route path="/login"   element={<GuestRoute><LoginPage /></GuestRoute>} />
         <Route path="/register" element={<GuestRoute><RegisterPage /></GuestRoute>} />
         <Route
