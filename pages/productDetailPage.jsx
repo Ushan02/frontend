@@ -92,7 +92,10 @@ export default function ProductDetailPage() {
     }
     const result = addToCart(product, quantity);
     if (result.ok) {
-      navigate("/cart");
+      const token = localStorage.getItem("token");
+      navigate(token ? "/checkout" : "/login", {
+        state: token ? undefined : { from: "/checkout", message: "Please login to checkout." },
+      });
     } else {
       setCartMsg(result.message);
     }

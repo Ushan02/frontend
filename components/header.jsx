@@ -5,7 +5,6 @@ import {
   HiOutlineArrowRightOnRectangle,
   HiOutlineArrowLeftOnRectangle,
   HiOutlineUserPlus,
-  HiOutlineBeaker,
   HiOutlineShoppingBag,
   HiOutlineShoppingCart,
 } from "react-icons/hi2";
@@ -73,10 +72,6 @@ export default function Header() {
             </span>
           )}
         </Link>
-
-        <NavLinkItem to="/testing" icon={HiOutlineBeaker} className="hidden md:flex">
-          Testing
-        </NavLinkItem>
 
         {user ? (
           <>

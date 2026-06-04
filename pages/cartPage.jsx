@@ -132,9 +132,9 @@ export default function CartPage() {
             </div>
             <p className="text-xs text-base-content/50">Shipping and taxes calculated at checkout.</p>
             <div className="card-actions flex-col sm:flex-row gap-2 mt-4">
-              <button type="button" className="btn btn-primary flex-1" disabled>
-                Checkout (coming soon)
-              </button>
+              <Link to="/checkout" className="btn btn-primary flex-1">
+                Proceed to checkout
+              </Link>
               <Link to="/products" className="btn btn-outline flex-1">
                 Continue shopping
               </Link>

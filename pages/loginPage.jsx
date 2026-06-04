@@ -35,7 +35,10 @@ export default function LoginPage() {
       localStorage.setItem("token", token);
       localStorage.setItem("user", JSON.stringify(user));
       reloadCart();
-      if (user.role === "admin") {
+      const redirectTo = location.state?.from;
+      if (redirectTo) {
+        navigate(redirectTo);
+      } else if (user.role === "admin") {
         navigate("/admin");
       } else {
         navigate("/");

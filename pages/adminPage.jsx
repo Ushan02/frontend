@@ -6,22 +6,29 @@ import {
   HiOutlineStar,
   HiOutlineArrowLeft,
   HiOutlineSquares2X2,
+  HiOutlineHome,
 } from "react-icons/hi2";
+import AdminDashboard from "./admin/adminDashboard";
 import AdminProduct from "./admin/adminProduct";
 import AddProduct from "./admin/addProduct";
 import EditProduct from "./admin/editProduct";
+import AdminUsers from "./admin/adminUsers";
+import AdminOrders from "./admin/adminOrders";
+import AdminReviews from "./admin/adminReviews";
 
 const navItems = [
+  { to: "/admin", label: "Dashboard", Icon: HiOutlineHome, end: true },
   { to: "/admin/products", label: "Products", Icon: HiOutlineCube },
-  { to: "/admin/users",    label: "Users",    Icon: HiOutlineUsers },
-  { to: "/admin/orders",   label: "Orders",   Icon: HiOutlineShoppingCart },
-  { to: "/admin/reviews",  label: "Reviews",  Icon: HiOutlineStar },
+  { to: "/admin/users", label: "Users", Icon: HiOutlineUsers },
+  { to: "/admin/orders", label: "Orders", Icon: HiOutlineShoppingCart },
+  { to: "/admin/reviews", label: "Reviews", Icon: HiOutlineStar },
 ];
 
-function SidebarLink({ to, label, Icon }) {
+function SidebarLink({ to, label, Icon, end }) {
   return (
     <NavLink
       to={to}
+      end={end}
       className={({ isActive }) =>
         `flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition ${
           isActive
@@ -33,15 +40,6 @@ function SidebarLink({ to, label, Icon }) {
       <Icon className="w-5 h-5 shrink-0" />
       {label}
     </NavLink>
-  );
-}
-
-function PlaceholderPage({ title }) {
-  return (
-    <div className="p-8">
-      <h1 className="text-2xl font-bold text-slate-800">{title}</h1>
-      <p className="text-slate-500 mt-2">This section is coming soon.</p>
-    </div>
   );
 }
 
@@ -89,13 +87,14 @@ export default function AdminPage() {
 
       <main className="flex-1 min-h-0 overflow-y-auto">
         <Routes>
-          <Route index element={<Navigate to="products" replace />} />
+          <Route index element={<AdminDashboard />} />
           <Route path="products" element={<AdminProduct />} />
           <Route path="products/add" element={<AddProduct />} />
           <Route path="products/edit/:productId" element={<EditProduct />} />
-          <Route path="users"    element={<PlaceholderPage title="Users" />} />
-          <Route path="orders"   element={<PlaceholderPage title="Orders" />} />
-          <Route path="reviews"  element={<PlaceholderPage title="Reviews" />} />
+          <Route path="users" element={<AdminUsers />} />
+          <Route path="orders" element={<AdminOrders />} />
+          <Route path="reviews" element={<AdminReviews />} />
+          <Route path="*" element={<Navigate to="/admin" replace />} />
         </Routes>
       </main>
     </div>

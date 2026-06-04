@@ -6,10 +6,10 @@ import LoginPage from '../pages/loginPage'
 import NotFoundPage from '../pages/notFoundPage'
 import AdminPage from '../pages/adminPage'
 import RegisterPage from '../pages/registerPage'
-import TestingPage from '../pages/testingPage'
 import ProductsPage from '../pages/productsPage'
 import ProductDetailPage from '../pages/productDetailPage'
 import CartPage from '../pages/cartPage'
+import CheckoutPage from '../pages/checkoutPage'
 import { CartProvider } from './context/CartContext'
 
 // Safely parse stored user
@@ -73,7 +73,7 @@ function App() {
             <Route path="/products" element={<ProductsPage />} />
             <Route path="/products/:productId" element={<ProductDetailPage />} />
             <Route path="/cart" element={<CartPage />} />
-            <Route path="/testing" element={<TestingPage />} />
+            <Route path="/checkout" element={<CheckoutPage />} />
             <Route path="/login" element={<GuestRoute><LoginPage /></GuestRoute>} />
             <Route path="/register" element={<GuestRoute><RegisterPage /></GuestRoute>} />
             <Route path="*" element={<NotFoundPage />} />
