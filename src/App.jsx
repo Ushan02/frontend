@@ -60,6 +60,7 @@ function App() {
       <CartProvider>
       <div className="min-h-screen flex flex-col min-w-0 overflow-x-hidden bg-base-200">
         <Header />
+        <div className="flex-1 flex flex-col min-w-0 pt-16">
         <Routes>
           <Route
             path="/admin/*"
@@ -81,6 +82,7 @@ function App() {
             <Route path="*" element={<NotFoundPage />} />
           </Route>
         </Routes>
+        </div>
       </div>
       </CartProvider>
     </BrowserRouter>

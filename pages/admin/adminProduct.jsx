@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import { HiOutlinePlus, HiOutlinePencil, HiOutlineTrash } from "react-icons/hi2";
+import { getCategoryLabel } from "../../src/lib/productCategories";
+import { formatPrice } from "../../src/lib/formatPrice";
 
 const API = import.meta.env.VITE_BACKEND_URL + "/api/products";
 
@@ -160,6 +162,7 @@ export default function AdminProduct() {
                 <th className="px-5 py-3.5 text-xs font-semibold uppercase tracking-wide">Image</th>
                 <th className="px-5 py-3.5 text-xs font-semibold uppercase tracking-wide">Product ID</th>
                 <th className="px-5 py-3.5 text-xs font-semibold uppercase tracking-wide">Name</th>
+                <th className="px-5 py-3.5 text-xs font-semibold uppercase tracking-wide">Category</th>
                 <th className="px-5 py-3.5 text-xs font-semibold uppercase tracking-wide">Labeled Price</th>
                 <th className="px-5 py-3.5 text-xs font-semibold uppercase tracking-wide">Price</th>
                 <th className="px-5 py-3.5 text-xs font-semibold uppercase tracking-wide">Stock</th>
@@ -187,11 +190,16 @@ export default function AdminProduct() {
                       </p>
                     )}
                   </td>
+                  <td className="px-5 py-3.5">
+                    <span className="px-2.5 py-1 rounded-full text-xs font-medium bg-indigo-100 text-indigo-700">
+                      {getCategoryLabel(product.category)}
+                    </span>
+                  </td>
                   <td className="px-5 py-3.5 text-sm text-slate-400 line-through">
-                    ${Number(product.labeledPrice).toFixed(2)}
+                    {formatPrice(product.labeledPrice)}
                   </td>
                   <td className="px-5 py-3.5 text-sm font-semibold text-slate-800">
-                    ${Number(product.price).toFixed(2)}
+                    {formatPrice(product.price)}
                   </td>
                   <td className="px-5 py-3.5">
                     <StockBadge stock={product.stock} />

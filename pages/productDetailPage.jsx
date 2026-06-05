@@ -12,6 +12,8 @@ import {
   HiOutlineBolt,
 } from "react-icons/hi2";
 import { useCart } from "../src/context/CartContext";
+import { getCategoryLabel } from "../src/lib/productCategories";
+import { formatPrice } from "../src/lib/formatPrice";
 
 const API = import.meta.env.VITE_BACKEND_URL + "/api/products";
 
@@ -164,9 +166,14 @@ export default function ProductDetailPage() {
 
           {/* Info */}
           <div className="flex flex-col">
-            <span className="badge badge-outline font-mono text-xs mb-3 w-fit">
-              {product.productId}
-            </span>
+            <div className="flex flex-wrap items-center gap-2 mb-3">
+              <span className="badge badge-primary badge-outline text-xs">
+                {getCategoryLabel(product.category)}
+              </span>
+              <span className="badge badge-outline font-mono text-xs">
+                {product.productId}
+              </span>
+            </div>
 
             <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-base-content leading-tight break-words">
               {product.productName}
@@ -183,13 +190,13 @@ export default function ProductDetailPage() {
               {onSale && (
                 <>
                   <span className="text-lg sm:text-2xl text-base-content/40 line-through">
-                    ${Number(product.labeledPrice).toFixed(2)}
+                    {formatPrice(product.labeledPrice)}
                   </span>
                   <span className="badge badge-error badge-sm">Save {discount}%</span>
                 </>
               )}
               <span className="text-3xl sm:text-4xl font-bold text-primary">
-                ${Number(product.price).toFixed(2)}
+                {formatPrice(product.price)}
               </span>
             </div>
 

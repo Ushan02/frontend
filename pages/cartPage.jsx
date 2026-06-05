@@ -7,6 +7,7 @@ import {
   HiOutlinePlus,
 } from "react-icons/hi2";
 import { useCart } from "../src/context/CartContext";
+import { formatPrice } from "../src/lib/formatPrice";
 
 export default function CartPage() {
   const { items, subtotal, cartCount, updateQuantity, removeFromCart, clearCart } =
@@ -83,9 +84,9 @@ export default function CartPage() {
                     {item.productId}
                   </p>
                   <p className="text-lg font-bold text-primary mt-auto pt-2">
-                    ${(item.price * item.quantity).toFixed(2)}
+                    {formatPrice(item.price * item.quantity)}
                     <span className="text-sm font-normal text-base-content/50 ml-1">
-                      (${Number(item.price).toFixed(2)} each)
+                      ({formatPrice(item.price)} each)
                     </span>
                   </p>
                 </div>
@@ -128,7 +129,7 @@ export default function CartPage() {
           <div className="card-body">
             <div className="flex justify-between text-lg">
               <span className="font-medium">Subtotal</span>
-              <span className="font-bold text-primary">${subtotal.toFixed(2)}</span>
+              <span className="font-bold text-primary">{formatPrice(subtotal)}</span>
             </div>
             <p className="text-xs text-base-content/50">Shipping and taxes calculated at checkout.</p>
             <div className="card-actions flex-col sm:flex-row gap-2 mt-4">

@@ -2,6 +2,7 @@ import { Fragment, useEffect, useState } from "react";
 import axios from "axios";
 import { HiOutlineChevronDown, HiOutlineChevronUp } from "react-icons/hi2";
 import { API_BASE, getAuthHeaders } from "../../src/lib/adminApi";
+import { formatPrice } from "../../src/lib/formatPrice";
 
 const API = API_BASE + "/api/order";
 
@@ -124,7 +125,7 @@ export default function AdminOrders() {
                       <p className="text-xs text-slate-500">{order.email}</p>
                     </td>
                     <td className="px-5 py-3.5 text-sm font-bold text-slate-800">
-                      ${Number(order.total).toFixed(2)}
+                      {formatPrice(order.total)}
                     </td>
                     <td className="px-5 py-3.5">
                       <StatusBadge status={order.status} />
@@ -160,8 +161,8 @@ export default function AdminOrders() {
                             <ul className="space-y-1">
                               {order.products?.map((line, i) => (
                                 <li key={i} className="text-slate-600">
-                                  {line.productinfo?.productName} × {line.quantity} — $
-                                  {(line.productinfo?.price * line.quantity).toFixed(2)}
+                                  {line.productinfo?.productName} × {line.quantity} —{" "}
+                                  {formatPrice(line.productinfo?.price * line.quantity)}
                                 </li>
                               ))}
                             </ul>

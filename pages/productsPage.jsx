@@ -9,8 +9,15 @@ import {
   HiOutlineTag,
 } from "react-icons/hi2";
 import { useCart } from "../src/context/CartContext";
+import { getCategoryLabel, PRODUCT_CATEGORIES } from "../src/lib/productCategories";
+import { formatPrice } from "../src/lib/formatPrice";
 
 const API = import.meta.env.VITE_BACKEND_URL + "/api/products";
+
+const CATEGORY_TABS = [
+  { value: "all", label: "All" },
+  ...PRODUCT_CATEGORIES,
+];
 
 function StockChip({ stock, outOfStock }) {
   if (outOfStock) {
@@ -118,7 +125,7 @@ function ProductCard({ product }) {
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0 flex-1">
             <p className="text-[10px] sm:text-[11px] font-semibold text-primary/80 uppercase tracking-[0.2em] truncate">
-              {product.productId}
+              {getCategoryLabel(product.category)}
             </p>
             <Link to={`/products/${product.productId}`} className="block min-w-0 mt-1.5">
               <h2 className="text-base sm:text-lg font-bold leading-snug line-clamp-2 text-base-content group-hover:text-primary transition-colors">
@@ -146,11 +153,11 @@ function ProductCard({ product }) {
             </p>
             <div className="flex items-baseline gap-2 flex-wrap">
               <span className="text-xl sm:text-2xl font-extrabold text-base-content tracking-tight">
-                ${Number(product.price).toFixed(2)}
+                {formatPrice(product.price)}
               </span>
               {onSale && (
                 <span className="text-sm text-base-content/35 line-through font-medium">
-                  ${Number(product.labeledPrice).toFixed(2)}
+                  {formatPrice(product.labeledPrice)}
                 </span>
               )}
             </div>
@@ -187,6 +194,7 @@ export default function ProductsPage() {
   const [products, setProducts] = useState([]);
   const [filtered, setFiltered] = useState([]);
   const [search, setSearch] = useState("");
+  const [category, setCategory] = useState("all");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -212,20 +220,24 @@ export default function ProductsPage() {
 
   useEffect(() => {
     const q = search.trim().toLowerCase();
-    if (!q) {
-      setFiltered(products);
-      return;
-    }
+
     setFiltered(
-      products.filter(
-        (p) =>
+      products.filter((p) => {
+        const productCategory = p.category || "accessories";
+        const matchesCategory = category === "all" || productCategory === category;
+        if (!matchesCategory) return false;
+        if (!q) return true;
+
+        return (
           p.productName?.toLowerCase().includes(q) ||
           p.productId?.toLowerCase().includes(q) ||
           p.descriptions?.toLowerCase().includes(q) ||
+          getCategoryLabel(productCategory).toLowerCase().includes(q) ||
           p.altNames?.some((n) => n.toLowerCase().includes(q))
-      )
+        );
+      })
     );
-  }, [search, products]);
+  }, [search, category, products]);
 
   return (
     <div className="flex-1 bg-base-200 min-w-0">
@@ -243,6 +255,26 @@ export default function ProductsPage() {
       </section>
 
       <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-6 sm:py-10 w-full min-w-0">
+        {/* Category menu */}
+        <div className="mb-5 sm:mb-6">
+          <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2 sm:gap-3">
+            {CATEGORY_TABS.map((tab) => (
+              <button
+                key={tab.value}
+                type="button"
+                onClick={() => setCategory(tab.value)}
+                className={`px-4 sm:px-5 py-2.5 rounded-full text-sm font-semibold transition-all min-h-11 ${
+                  category === tab.value
+                    ? "bg-primary text-primary-content shadow-md"
+                    : "bg-base-100 text-base-content/70 border border-base-300 hover:border-primary hover:text-primary"
+                }`}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
         {/* Search */}
         <div className="mb-5 sm:mb-8">
           <label className="input input-bordered flex items-center gap-2 w-full sm:max-w-md bg-base-100 shadow-sm min-h-12">
@@ -272,13 +304,18 @@ export default function ProductsPage() {
           <div className="text-center py-16 sm:py-24 px-4">
             <HiOutlineShoppingBag className="w-14 h-14 sm:w-16 sm:h-16 mx-auto text-base-content/20 mb-4" />
             <p className="text-base sm:text-lg font-medium text-base-content/70">
-              {search ? "No products match your search." : "No products available yet."}
+              {search
+                ? "No products match your search."
+                : category !== "all"
+                  ? `No ${getCategoryLabel(category).toLowerCase()} available yet.`
+                  : "No products available yet."}
             </p>
           </div>
         ) : (
           <>
             <p className="text-xs sm:text-sm text-base-content/50 mb-4 sm:mb-6">
               {filtered.length} product{filtered.length !== 1 ? "s" : ""}
+              {category !== "all" && ` in ${getCategoryLabel(category)}`}
               {search && ` matching "${search}"`}
             </p>
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-5 sm:gap-7 lg:gap-8 w-full min-w-0">

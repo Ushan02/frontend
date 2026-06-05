@@ -10,6 +10,7 @@ import {
   HiOutlineCheckCircle,
 } from "react-icons/hi2";
 import { useCart } from "../src/context/CartContext";
+import { formatPrice } from "../src/lib/formatPrice";
 
 const ORDER_API = import.meta.env.VITE_BACKEND_URL + "/api/order";
 
@@ -116,7 +117,7 @@ export default function CheckoutPage() {
           has been received.
         </p>
         <p className="text-lg font-bold text-primary mt-4">
-          Total: ${Number(orderSuccess.total).toFixed(2)}
+          Total: {formatPrice(orderSuccess.total)}
         </p>
         <div className="flex gap-3 mt-8">
           <Link to="/products" className="btn btn-primary">
@@ -218,7 +219,7 @@ export default function CheckoutPage() {
               ) : (
                 <>
                   <HiOutlineCreditCard className="w-5 h-5" />
-                  Place order — ${subtotal.toFixed(2)}
+                  Place order — {formatPrice(subtotal)}
                 </>
               )}
             </button>
@@ -243,7 +244,7 @@ export default function CheckoutPage() {
                         <p className="text-base-content/50">Qty: {item.quantity}</p>
                       </div>
                       <p className="font-semibold shrink-0">
-                        ${(item.price * item.quantity).toFixed(2)}
+                        {formatPrice(item.price * item.quantity)}
                       </p>
                     </li>
                   ))}
@@ -251,7 +252,7 @@ export default function CheckoutPage() {
                 <div className="divider my-2" />
                 <div className="flex justify-between text-lg font-bold">
                   <span>Total</span>
-                  <span className="text-primary">${subtotal.toFixed(2)}</span>
+                  <span className="text-primary">{formatPrice(subtotal)}</span>
                 </div>
               </div>
             </div>

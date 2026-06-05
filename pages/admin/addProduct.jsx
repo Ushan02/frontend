@@ -8,6 +8,7 @@ import {
   getStorageHint,
   uniqueImagePath,
 } from "../../src/lib/supabase";
+import { PRODUCT_CATEGORIES } from "../../src/lib/productCategories";
 
 const API = import.meta.env.VITE_BACKEND_URL + "/api/products";
 const BUCKET = import.meta.env.VITE_SUPABASE_BUCKET || "images";
@@ -25,6 +26,7 @@ const initialForm = {
   labeledPrice: "",
   price: "",
   stock: "",
+  category: "accessories",
   isAvailable: true,
 };
 
@@ -131,6 +133,7 @@ export default function AddProduct() {
         labeledPrice: Number(labeledPrice),
         price: Number(price),
         stock: Number(form.stock),
+        category: form.category,
         isAvailable: form.isAvailable,
       };
 
@@ -201,6 +204,22 @@ export default function AddProduct() {
           </div>
 
           <label className="form-control w-full">
+            <span className="label-text text-slate-600 font-medium">Category *</span>
+            <select
+              value={form.category}
+              onChange={(e) => update("category", e.target.value)}
+              className="select select-bordered w-full mt-1"
+              required
+            >
+              {PRODUCT_CATEGORIES.map((item) => (
+                <option key={item.value} value={item.value}>
+                  {item.label}
+                </option>
+              ))}
+            </select>
+          </label>
+
+          <label className="form-control w-full">
             <span className="label-text text-slate-600 font-medium">Alt Names</span>
             <input
               type="text"
@@ -224,7 +243,7 @@ export default function AddProduct() {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <label className="form-control w-full">
-              <span className="label-text text-slate-600 font-medium">Labeled Price ($) *</span>
+              <span className="label-text text-slate-600 font-medium">Labeled Price (RS) *</span>
               <input
                 type="number"
                 min="0"
@@ -238,7 +257,7 @@ export default function AddProduct() {
             </label>
 
             <label className="form-control w-full">
-              <span className="label-text text-slate-600 font-medium">Price ($) *</span>
+              <span className="label-text text-slate-600 font-medium">Price (RS) *</span>
               <input
                 type="number"
                 min="0"
