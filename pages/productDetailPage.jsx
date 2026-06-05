@@ -66,12 +66,19 @@ export default function ProductDetailPage() {
   }
 
   const images = product.images?.length ? product.images : [];
+  const stock = Number(product.stock ?? 0);
+  const outOfStock = stock === 0;
+  const canBuy = product.isAvailable && !outOfStock;
   const onSale = Number(product.labeledPrice) > Number(product.price);
   const discount = onSale
     ? Math.round((1 - product.price / product.labeledPrice) * 100)
     : 0;
 
   const handleAddToCart = () => {
+    if (outOfStock) {
+      setCartMsg("This product is out of stock.");
+      return;
+    }
     if (!product.isAvailable) {
       setCartMsg("This product is currently unavailable.");
       return;
@@ -86,6 +93,10 @@ export default function ProductDetailPage() {
   };
 
   const handleBuyNow = () => {
+    if (outOfStock) {
+      setCartMsg("This product is out of stock.");
+      return;
+    }
     if (!product.isAvailable) {
       setCartMsg("This product is currently unavailable.");
       return;
@@ -102,17 +113,17 @@ export default function ProductDetailPage() {
   };
 
   return (
-    <div className="flex-1 bg-gradient-to-b from-base-200/40 to-base-100">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8">
+    <div className="flex-1 bg-base-200 min-w-0">
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-5 sm:py-8 w-full min-w-0">
         <Link
           to="/products"
-          className="inline-flex items-center gap-2 text-sm text-base-content/60 hover:text-primary mb-8 transition"
+          className="inline-flex items-center gap-2 text-sm text-base-content/60 hover:text-primary mb-5 sm:mb-8 transition"
         >
-          <HiOutlineArrowLeft className="w-4 h-4" />
+          <HiOutlineArrowLeft className="w-4 h-4 shrink-0" />
           Back to products
         </Link>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-14">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-10 lg:gap-14">
           {/* Gallery */}
           <div className="space-y-4">
             <div className="card bg-base-100 shadow-xl overflow-hidden border border-base-200/80">
@@ -138,7 +149,7 @@ export default function ProductDetailPage() {
                     key={url}
                     type="button"
                     onClick={() => setActiveImage(i)}
-                    className={`shrink-0 w-20 h-20 rounded-xl overflow-hidden border-2 transition ${
+                    className={`shrink-0 w-16 h-16 sm:w-20 sm:h-20 rounded-xl overflow-hidden border-2 transition ${
                       activeImage === i
                         ? "border-primary ring-2 ring-primary/30"
                         : "border-base-300 opacity-70 hover:opacity-100"
@@ -157,7 +168,7 @@ export default function ProductDetailPage() {
               {product.productId}
             </span>
 
-            <h1 className="text-3xl sm:text-4xl font-bold text-base-content leading-tight">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-base-content leading-tight break-words">
               {product.productName}
             </h1>
 
@@ -168,21 +179,21 @@ export default function ProductDetailPage() {
               </p>
             )}
 
-            <div className="flex items-center gap-3 mt-6 flex-wrap">
+            <div className="flex items-center gap-2 sm:gap-3 mt-4 sm:mt-6 flex-wrap">
               {onSale && (
                 <>
-                  <span className="text-2xl text-base-content/40 line-through">
+                  <span className="text-lg sm:text-2xl text-base-content/40 line-through">
                     ${Number(product.labeledPrice).toFixed(2)}
                   </span>
-                  <span className="badge badge-error">Save {discount}%</span>
+                  <span className="badge badge-error badge-sm">Save {discount}%</span>
                 </>
               )}
-              <span className="text-4xl font-bold text-primary">
+              <span className="text-3xl sm:text-4xl font-bold text-primary">
                 ${Number(product.price).toFixed(2)}
               </span>
             </div>
 
-            <div className="divider my-6" />
+            <div className="divider my-4 sm:my-6" />
 
             <h2 className="text-sm font-semibold uppercase tracking-wide text-base-content/50 mb-2">
               Description
@@ -191,7 +202,7 @@ export default function ProductDetailPage() {
               {product.descriptions}
             </p>
 
-            {product.isAvailable && (
+            {canBuy && (
               <div className="flex items-center gap-3 mt-6">
                 <span className="text-sm font-medium text-base-content/70">Quantity</span>
                 <div className="flex items-center border border-base-300 rounded-lg">
@@ -236,31 +247,33 @@ export default function ProductDetailPage() {
               </div>
             )}
 
-            <div className="mt-6 pt-6 border-t border-base-200 flex flex-col sm:flex-row gap-3">
+            <div className="mt-5 sm:mt-6 pt-5 sm:pt-6 border-t border-base-200 flex flex-col sm:flex-row gap-3">
               <button
                 type="button"
                 onClick={handleAddToCart}
-                disabled={!product.isAvailable}
-                className="btn btn-primary btn-lg flex-1 gap-2"
+                disabled={!canBuy}
+                className="btn btn-primary btn-md sm:btn-lg flex-1 gap-2 min-h-12"
               >
-                <HiOutlineShoppingCart className="w-5 h-5" />
+                <HiOutlineShoppingCart className="w-5 h-5 shrink-0" />
                 Add to Cart
               </button>
               <button
                 type="button"
                 onClick={handleBuyNow}
-                disabled={!product.isAvailable}
-                className="btn btn-outline btn-lg flex-1 gap-2"
+                disabled={!canBuy}
+                className="btn btn-outline btn-md sm:btn-lg flex-1 gap-2 min-h-12"
               >
-                <HiOutlineBolt className="w-5 h-5" />
+                <HiOutlineBolt className="w-5 h-5 shrink-0" />
                 Buy Now
               </button>
             </div>
 
-            <p className="text-xs text-base-content/40 mt-4">
-              {product.isAvailable
-                ? "✓ In stock and ready to ship"
-                : "Currently unavailable"}
+            <p className={`text-xs mt-4 ${outOfStock ? "text-red-600 font-medium" : "text-base-content/40"}`}>
+              {outOfStock
+                ? "Out of stock"
+                : product.isAvailable
+                  ? "✓ In stock and ready to ship"
+                  : "Currently unavailable"}
             </p>
           </div>
         </div>

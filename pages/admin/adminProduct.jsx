@@ -10,7 +10,17 @@ function getAuthHeaders() {
   return token ? { Authorization: `Bearer ${token}` } : {};
 }
 
-function AvailabilityBadge({ isAvailable }) {
+function AvailabilityBadge({ isAvailable, stock }) {
+  const count = Number(stock ?? 0);
+
+  if (count === 0) {
+    return (
+      <span className="px-2.5 py-1 rounded-full text-xs font-medium bg-red-100 text-red-700">
+        Out of stock
+      </span>
+    );
+  }
+
   return (
     <span
       className={`px-2.5 py-1 rounded-full text-xs font-medium ${
@@ -18,6 +28,33 @@ function AvailabilityBadge({ isAvailable }) {
       }`}
     >
       {isAvailable ? "Available" : "Unavailable"}
+    </span>
+  );
+}
+
+function StockBadge({ stock }) {
+  const count = Number(stock ?? 0);
+  const label = count === 1 ? "1 unit" : `${count} units`;
+
+  if (count === 0) {
+    return (
+      <span className="px-2.5 py-1 rounded-full text-xs font-medium bg-red-100 text-red-700">
+        Out of stock
+      </span>
+    );
+  }
+
+  if (count <= 5) {
+    return (
+      <span className="px-2.5 py-1 rounded-full text-xs font-medium bg-amber-100 text-amber-700">
+        Low: {label}
+      </span>
+    );
+  }
+
+  return (
+    <span className="px-2.5 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-700">
+      {label}
     </span>
   );
 }
@@ -77,15 +114,15 @@ export default function AdminProduct() {
   };
 
   return (
-    <div className="p-8">
-      <div className="flex items-center justify-between mb-6">
+    <div className="p-4 sm:p-6 lg:p-8 min-w-0">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-slate-800">Products</h1>
+          <h1 className="text-xl sm:text-2xl font-bold text-slate-800">Products</h1>
           <p className="text-slate-500 text-sm mt-1">Manage your store inventory</p>
         </div>
         <Link
           to="/admin/products/add"
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition shadow-sm flex items-center gap-2"
+          className="bg-blue-600 text-white px-4 py-2.5 rounded-lg text-sm font-medium hover:bg-blue-700 transition shadow-sm flex items-center justify-center gap-2 min-h-11 w-full sm:w-auto"
         >
           <HiOutlinePlus className="w-4 h-4" />
           Add Product
@@ -125,6 +162,7 @@ export default function AdminProduct() {
                 <th className="px-5 py-3.5 text-xs font-semibold uppercase tracking-wide">Name</th>
                 <th className="px-5 py-3.5 text-xs font-semibold uppercase tracking-wide">Labeled Price</th>
                 <th className="px-5 py-3.5 text-xs font-semibold uppercase tracking-wide">Price</th>
+                <th className="px-5 py-3.5 text-xs font-semibold uppercase tracking-wide">Stock</th>
                 <th className="px-5 py-3.5 text-xs font-semibold uppercase tracking-wide">Available</th>
                 <th className="px-5 py-3.5 text-xs font-semibold uppercase tracking-wide">Actions</th>
               </tr>
@@ -156,7 +194,10 @@ export default function AdminProduct() {
                     ${Number(product.price).toFixed(2)}
                   </td>
                   <td className="px-5 py-3.5">
-                    <AvailabilityBadge isAvailable={product.isAvailable} />
+                    <StockBadge stock={product.stock} />
+                  </td>
+                  <td className="px-5 py-3.5">
+                    <AvailabilityBadge isAvailable={product.isAvailable} stock={product.stock} />
                   </td>
                   <td className="px-5 py-3.5">
                     <div className="flex gap-3">

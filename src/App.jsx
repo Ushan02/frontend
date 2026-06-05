@@ -47,7 +47,7 @@ function GuestRoute({ children }) {
 
 function PageLayout() {
   return (
-    <main className="flex-1 flex flex-col min-h-0">
+    <main className="flex-1 flex flex-col min-h-0 min-w-0 overflow-x-hidden">
       <Outlet />
     </main>
   );
@@ -57,7 +57,7 @@ function App() {
   return (
     <BrowserRouter>
       <CartProvider>
-      <div className="min-h-screen flex flex-col">
+      <div className="min-h-screen flex flex-col min-w-0 overflow-x-hidden bg-base-200">
         <Header />
         <Routes>
           <Route

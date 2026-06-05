@@ -62,9 +62,9 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="flex flex-1 flex-col justify-center items-center bg-gray-100">
-      <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-sm">
-        <h1 className="text-2xl font-bold mb-6 text-center text-gray-800">
+    <div className="flex flex-1 flex-col justify-center items-center bg-base-200 px-4 py-8 sm:py-12 min-w-0">
+      <div className="bg-white p-6 sm:p-8 rounded-xl shadow-md w-full max-w-sm">
+        <h1 className="text-xl sm:text-2xl font-bold mb-6 text-center text-gray-800">
           Create account
         </h1>
 
@@ -74,7 +74,7 @@ export default function RegisterPage() {
           </div>
         )}
 
-        <div className="flex gap-3 mb-4">
+        <div className="flex flex-col sm:flex-row gap-3 mb-4">
           <div className="flex-1">
             <label className="block text-sm font-medium text-gray-600 mb-1">
               First name
@@ -85,7 +85,7 @@ export default function RegisterPage() {
               value={form.firstName}
               onChange={set("firstName")}
               onKeyDown={handleKeyDown}
-              className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+              className="w-full border border-gray-300 rounded px-3 py-2.5 min-h-11 text-base focus:outline-none focus:ring-2 focus:ring-blue-400"
             />
           </div>
           <div className="flex-1">
@@ -98,7 +98,7 @@ export default function RegisterPage() {
               value={form.lastName}
               onChange={set("lastName")}
               onKeyDown={handleKeyDown}
-              className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+              className="w-full border border-gray-300 rounded px-3 py-2.5 min-h-11 text-base focus:outline-none focus:ring-2 focus:ring-blue-400"
             />
           </div>
         </div>
@@ -112,7 +112,7 @@ export default function RegisterPage() {
           value={form.email}
           onChange={set("email")}
           onKeyDown={handleKeyDown}
-          className="w-full border border-gray-300 rounded px-3 py-2 mb-4 focus:outline-none focus:ring-2 focus:ring-blue-400"
+          className="w-full border border-gray-300 rounded px-3 py-2.5 min-h-11 text-base mb-4 focus:outline-none focus:ring-2 focus:ring-blue-400"
         />
 
         <label className="block text-sm font-medium text-gray-600 mb-1">
@@ -124,7 +124,7 @@ export default function RegisterPage() {
           value={form.password}
           onChange={set("password")}
           onKeyDown={handleKeyDown}
-          className="w-full border border-gray-300 rounded px-3 py-2 mb-4 focus:outline-none focus:ring-2 focus:ring-blue-400"
+          className="w-full border border-gray-300 rounded px-3 py-2.5 min-h-11 text-base mb-4 focus:outline-none focus:ring-2 focus:ring-blue-400"
         />
 
         <label className="block text-sm font-medium text-gray-600 mb-1">
@@ -136,13 +136,13 @@ export default function RegisterPage() {
           value={form.confirmPassword}
           onChange={set("confirmPassword")}
           onKeyDown={handleKeyDown}
-          className="w-full border border-gray-300 rounded px-3 py-2 mb-6 focus:outline-none focus:ring-2 focus:ring-blue-400"
+          className="w-full border border-gray-300 rounded px-3 py-2.5 min-h-11 text-base mb-6 focus:outline-none focus:ring-2 focus:ring-blue-400"
         />
 
         <button
           onClick={handleRegister}
           disabled={loading}
-          className="w-full bg-blue-500 hover:bg-blue-600 disabled:bg-blue-300 text-white font-semibold py-2 rounded transition"
+          className="w-full bg-blue-500 hover:bg-blue-600 disabled:bg-blue-300 text-white font-semibold py-2.5 min-h-11 rounded-lg transition"
         >
           {loading ? "Creating account…" : "Create account"}
         </button>

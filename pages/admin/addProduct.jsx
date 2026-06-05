@@ -24,6 +24,7 @@ const initialForm = {
   descriptions: "",
   labeledPrice: "",
   price: "",
+  stock: "",
   isAvailable: true,
 };
 
@@ -104,6 +105,10 @@ export default function AddProduct() {
       setError("Labeled price and price are required.");
       return;
     }
+    if (form.stock === "" || Number(form.stock) < 0) {
+      setError("Stock is required and must be 0 or greater.");
+      return;
+    }
     if (imageItems.length === 0) {
       setError("Please upload at least one product image.");
       return;
@@ -125,6 +130,7 @@ export default function AddProduct() {
         images,
         labeledPrice: Number(labeledPrice),
         price: Number(price),
+        stock: Number(form.stock),
         isAvailable: form.isAvailable,
       };
 
@@ -245,6 +251,20 @@ export default function AddProduct() {
               />
             </label>
           </div>
+
+          <label className="form-control w-full">
+            <span className="label-text text-slate-600 font-medium">Stock *</span>
+            <input
+              type="number"
+              min="0"
+              step="1"
+              placeholder="100"
+              value={form.stock}
+              onChange={(e) => update("stock", e.target.value)}
+              className="input input-bordered w-full mt-1"
+              required
+            />
+          </label>
 
           <div className="form-control w-full">
             <span className="label-text text-slate-600 font-medium flex items-center gap-2">

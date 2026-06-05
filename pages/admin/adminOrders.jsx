@@ -66,9 +66,9 @@ export default function AdminOrders() {
   };
 
   return (
-    <div className="p-8">
+    <div className="p-4 sm:p-6 lg:p-8 min-w-0">
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-slate-800">Orders</h1>
+        <h1 className="text-xl sm:text-2xl font-bold text-slate-800">Orders</h1>
         <p className="text-slate-500 text-sm mt-1">View and update customer orders</p>
       </div>
 

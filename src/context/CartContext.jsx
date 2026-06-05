@@ -51,6 +51,9 @@ export function CartProvider({ children }) {
   }, []);
 
   const addToCart = useCallback((product, quantity = 1) => {
+    if (Number(product?.stock ?? 0) === 0) {
+      return { ok: false, message: "Product is out of stock." };
+    }
     if (!product?.isAvailable) return { ok: false, message: "Product is unavailable." };
 
     const qty = Math.max(1, Number(quantity) || 1);

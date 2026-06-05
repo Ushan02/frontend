@@ -1,4 +1,5 @@
-import { NavLink, Routes, Route, Navigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { NavLink, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import {
   HiOutlineCube,
   HiOutlineUsers,
@@ -7,6 +8,8 @@ import {
   HiOutlineArrowLeft,
   HiOutlineSquares2X2,
   HiOutlineHome,
+  HiOutlineBars3,
+  HiOutlineXMark,
 } from "react-icons/hi2";
 import AdminDashboard from "./admin/adminDashboard";
 import AdminProduct from "./admin/adminProduct";
@@ -24,13 +27,14 @@ const navItems = [
   { to: "/admin/reviews", label: "Reviews", Icon: HiOutlineStar },
 ];
 
-function SidebarLink({ to, label, Icon, end }) {
+function SidebarLink({ to, label, Icon, end, onNavigate }) {
   return (
     <NavLink
       to={to}
       end={end}
+      onClick={onNavigate}
       className={({ isActive }) =>
-        `flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition ${
+        `flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition min-h-11 ${
           isActive
             ? "bg-blue-600 text-white shadow-sm"
             : "text-slate-300 hover:bg-slate-800 hover:text-white"
@@ -44,6 +48,9 @@ function SidebarLink({ to, label, Icon, end }) {
 }
 
 export default function AdminPage() {
+  const location = useLocation();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
   const user = (() => {
     try {
       const raw = localStorage.getItem("user");
@@ -53,39 +60,96 @@ export default function AdminPage() {
     }
   })();
 
+  useEffect(() => {
+    setSidebarOpen(false);
+  }, [location.pathname]);
+
+  useEffect(() => {
+    document.body.style.overflow = sidebarOpen ? "hidden" : "";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [sidebarOpen]);
+
+  const closeSidebar = () => setSidebarOpen(false);
+
+  const sidebarContent = (
+    <>
+      <div className="px-5 py-5 border-b border-slate-700">
+        <h2 className="text-lg font-bold tracking-wide flex items-center gap-2">
+          <HiOutlineSquares2X2 className="w-5 h-5 shrink-0" />
+          Admin Panel
+        </h2>
+        {user && (
+          <p className="text-slate-400 text-sm mt-1 truncate">
+            {user.firstName} {user.lastName}
+          </p>
+        )}
+      </div>
+
+      <nav className="flex flex-col gap-1 p-4 flex-1">
+        {navItems.map((item) => (
+          <SidebarLink key={item.to} {...item} onNavigate={closeSidebar} />
+        ))}
+      </nav>
+
+      <div className="p-4 border-t border-slate-700">
+        <NavLink
+          to="/"
+          onClick={closeSidebar}
+          className="flex items-center gap-2 px-4 py-3 text-sm text-slate-400 hover:text-white transition min-h-11"
+        >
+          <HiOutlineArrowLeft className="w-4 h-4 shrink-0" />
+          Back to Store
+        </NavLink>
+      </div>
+    </>
+  );
+
   return (
-    <div className="flex h-[calc(100vh-4rem)] bg-slate-100 overflow-hidden">
-      <aside className="w-64 shrink-0 h-full bg-slate-900 text-white flex flex-col overflow-y-auto">
-        <div className="px-6 py-6 border-b border-slate-700">
-          <h2 className="text-lg font-bold tracking-wide flex items-center gap-2">
-            <HiOutlineSquares2X2 className="w-5 h-5" />
-            Admin Panel
-          </h2>
-          {user && (
-            <p className="text-slate-400 text-sm mt-1">
-              {user.firstName} {user.lastName}
-            </p>
-          )}
-        </div>
+    <div className="flex flex-col lg:flex-row min-h-[calc(100dvh-4rem)] bg-base-200 min-w-0">
+      <div className="lg:hidden sticky top-16 z-30 flex items-center justify-between gap-3 px-4 py-3 bg-slate-900 text-white border-b border-slate-700">
+        <button
+          type="button"
+          onClick={() => setSidebarOpen(true)}
+          className="p-2 rounded-lg hover:bg-slate-800 transition"
+          aria-label="Open admin menu"
+        >
+          <HiOutlineBars3 className="w-6 h-6" />
+        </button>
+        <span className="font-semibold text-sm truncate">Admin Panel</span>
+        <div className="w-10" aria-hidden />
+      </div>
 
-        <nav className="flex flex-col gap-1 p-4 flex-1">
-          {navItems.map((item) => (
-            <SidebarLink key={item.to} {...item} />
-          ))}
-        </nav>
+      {sidebarOpen && (
+        <button
+          type="button"
+          className="fixed inset-0 top-16 z-40 bg-black/50 lg:hidden"
+          aria-label="Close admin menu"
+          onClick={closeSidebar}
+        />
+      )}
 
-        <div className="p-4 border-t border-slate-700">
-          <NavLink
-            to="/"
-            className="flex items-center gap-2 px-4 py-2 text-sm text-slate-400 hover:text-white transition"
+      <aside
+        className={`fixed top-16 left-0 z-50 h-[calc(100dvh-4rem)] w-64 max-w-[85vw] bg-slate-900 text-white flex flex-col overflow-y-auto transition-transform duration-300 ease-out lg:static lg:translate-x-0 lg:shrink-0 lg:max-w-none lg:pointer-events-auto ${
+          sidebarOpen ? "translate-x-0 pointer-events-auto" : "-translate-x-full pointer-events-none"
+        }`}
+        aria-hidden={!sidebarOpen}
+      >
+        <div className="lg:hidden flex justify-end p-3 border-b border-slate-700">
+          <button
+            type="button"
+            onClick={closeSidebar}
+            className="p-2 rounded-lg hover:bg-slate-800 transition"
+            aria-label="Close admin menu"
           >
-            <HiOutlineArrowLeft className="w-4 h-4" />
-            Back to Store
-          </NavLink>
+            <HiOutlineXMark className="w-6 h-6" />
+          </button>
         </div>
+        {sidebarContent}
       </aside>
 
-      <main className="flex-1 min-h-0 overflow-y-auto">
+      <main className="flex-1 min-w-0 min-h-0 overflow-x-hidden">
         <Routes>
           <Route index element={<AdminDashboard />} />
           <Route path="products" element={<AdminProduct />} />

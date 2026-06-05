@@ -107,7 +107,7 @@ export default function CheckoutPage() {
 
   if (orderSuccess) {
     return (
-      <div className="flex-1 flex flex-col items-center justify-center px-6 py-16 bg-base-100">
+      <div className="flex-1 flex flex-col items-center justify-center px-6 py-16 bg-base-200">
         <HiOutlineCheckCircle className="w-20 h-20 text-success mb-4" />
         <h1 className="text-2xl font-bold text-base-content">Order placed!</h1>
         <p className="text-base-content/60 mt-2 text-center max-w-md">
@@ -131,8 +131,8 @@ export default function CheckoutPage() {
   }
 
   return (
-    <div className="flex-1 bg-base-200/40">
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-10">
+    <div className="flex-1 bg-base-200 min-w-0">
+      <div className="max-w-5xl mx-auto px-3 sm:px-6 py-6 sm:py-10 w-full">
         <Link
           to="/cart"
           className="inline-flex items-center gap-2 text-sm text-base-content/60 hover:text-primary mb-6"
@@ -141,12 +141,12 @@ export default function CheckoutPage() {
           Back to cart
         </Link>
 
-        <h1 className="text-2xl sm:text-3xl font-bold flex items-center gap-2 mb-8">
+        <h1 className="text-xl sm:text-2xl md:text-3xl font-bold flex items-center gap-2 mb-6 sm:mb-8">
           <HiOutlineCreditCard className="w-8 h-8 text-primary" />
           Checkout
         </h1>
 
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-5 sm:gap-8">
           <form onSubmit={handleSubmit} className="lg:col-span-3 space-y-5">
             <div className="card bg-base-100 shadow-sm border border-base-200/80">
               <div className="card-body">
@@ -208,7 +208,7 @@ export default function CheckoutPage() {
             <button
               type="submit"
               disabled={submitting}
-              className="btn btn-primary btn-lg w-full gap-2"
+              className="btn btn-primary btn-md sm:btn-lg w-full gap-2 min-h-12"
             >
               {submitting ? (
                 <>
@@ -225,7 +225,7 @@ export default function CheckoutPage() {
           </form>
 
           <div className="lg:col-span-2">
-            <div className="card bg-base-100 shadow-sm border border-base-200/80 sticky top-20">
+            <div className="card bg-base-100 shadow-sm border border-base-200/80 lg:sticky lg:top-20">
               <div className="card-body">
                 <h2 className="card-title text-lg">Order summary</h2>
                 <ul className="space-y-3 max-h-64 overflow-y-auto">

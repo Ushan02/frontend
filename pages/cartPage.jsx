@@ -14,7 +14,7 @@ export default function CartPage() {
 
   if (items.length === 0) {
     return (
-      <div className="flex-1 flex flex-col items-center justify-center px-6 py-20 bg-base-100">
+      <div className="flex-1 flex flex-col items-center justify-center px-6 py-20 bg-base-200">
         <HiOutlineShoppingCart className="w-20 h-20 text-base-content/20 mb-4" />
         <h1 className="text-2xl font-bold text-base-content">Your cart is empty</h1>
         <p className="text-base-content/60 mt-2 mb-6">Add products to get started.</p>
@@ -27,9 +27,9 @@ export default function CartPage() {
   }
 
   return (
-    <div className="flex-1 bg-base-200/40">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 py-10">
-        <div className="flex items-center justify-between mb-8">
+    <div className="flex-1 bg-base-200 min-w-0">
+      <div className="max-w-4xl mx-auto px-3 sm:px-6 py-6 sm:py-10 w-full">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6 sm:mb-8">
           <div>
             <h1 className="text-2xl sm:text-3xl font-bold flex items-center gap-2">
               <HiOutlineShoppingCart className="w-8 h-8 text-primary" />
@@ -42,7 +42,7 @@ export default function CartPage() {
           <button
             type="button"
             onClick={clearCart}
-            className="btn btn-ghost btn-sm text-error"
+            className="btn btn-ghost btn-sm text-error self-start sm:self-auto"
           >
             Clear cart
           </button>
@@ -54,7 +54,7 @@ export default function CartPage() {
               key={item.productId}
               className="card bg-base-100 shadow-sm border border-base-200/80"
             >
-              <div className="card-body p-4 sm:p-5 flex flex-row gap-4">
+              <div className="card-body p-3 sm:p-5 flex flex-col sm:flex-row gap-3 sm:gap-4">
                 <Link
                   to={`/products/${item.productId}`}
                   className="shrink-0 w-24 h-24 sm:w-28 sm:h-28 rounded-xl overflow-hidden bg-base-200"
@@ -90,7 +90,7 @@ export default function CartPage() {
                   </p>
                 </div>
 
-                <div className="flex flex-col items-end justify-between gap-2">
+                <div className="flex flex-row sm:flex-col items-center sm:items-end justify-between gap-2">
                   <button
                     type="button"
                     onClick={() => removeFromCart(item.productId)}

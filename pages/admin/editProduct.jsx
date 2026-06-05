@@ -27,6 +27,7 @@ export default function EditProduct() {
     descriptions: "",
     labeledPrice: "",
     price: "",
+    stock: "",
     isAvailable: true,
   });
   const [existingImages, setExistingImages] = useState([]);
@@ -50,6 +51,7 @@ export default function EditProduct() {
           descriptions: p.descriptions ?? "",
           labeledPrice: String(p.labeledPrice ?? ""),
           price: String(p.price ?? ""),
+          stock: String(p.stock ?? 0),
           isAvailable: Boolean(p.isAvailable),
         });
         setExistingImages(Array.isArray(p.images) ? [...p.images] : []);
@@ -128,6 +130,10 @@ export default function EditProduct() {
       setError("Labeled price and price are required.");
       return;
     }
+    if (form.stock === "" || Number(form.stock) < 0) {
+      setError("Stock is required and must be 0 or greater.");
+      return;
+    }
 
     const totalImages = existingImages.length + newImageItems.length;
     if (totalImages === 0) {
@@ -151,6 +157,7 @@ export default function EditProduct() {
         images,
         labeledPrice: Number(labeledPrice),
         price: Number(price),
+        stock: Number(form.stock),
         isAvailable: form.isAvailable,
       };
 
@@ -287,6 +294,19 @@ export default function EditProduct() {
               />
             </label>
           </div>
+
+          <label className="form-control w-full">
+            <span className="label-text text-slate-600 font-medium">Stock *</span>
+            <input
+              type="number"
+              min="0"
+              step="1"
+              value={form.stock}
+              onChange={(e) => update("stock", e.target.value)}
+              className="input input-bordered w-full mt-1"
+              required
+            />
+          </label>
 
           <div className="form-control w-full">
             <span className="label-text text-slate-600 font-medium flex items-center gap-2">
