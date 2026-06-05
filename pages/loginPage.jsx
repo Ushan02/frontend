@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 import { GoogleLogin } from "@react-oauth/google";
 import {
@@ -123,7 +123,12 @@ export default function LoginPage() {
           />
         </div>
 
-        <label className="block text-sm font-medium text-gray-600 mb-1">Password</label>
+        <div className="flex items-center justify-between mb-1">
+          <label className="block text-sm font-medium text-gray-600">Password</label>
+          <Link to="/forgot-password" className="text-xs text-blue-500 hover:underline">
+            Forgot password?
+          </Link>
+        </div>
         <div className="relative mb-6">
           <HiOutlineLockClosed className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
           <input

@@ -1,9 +1,22 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { HiOutlineNoSymbol, HiOutlineCheck } from "react-icons/hi2";
+import {
+  HiOutlineNoSymbol,
+  HiOutlineCheck,
+  HiOutlineUserPlus,
+  HiOutlineShieldCheck,
+} from "react-icons/hi2";
 import { API_BASE, getAuthHeaders } from "../../src/lib/adminApi";
 
 const API = API_BASE + "/api/users";
+
+const EMPTY_FORM = {
+  firstName: "",
+  lastName: "",
+  email: "",
+  password: "",
+  role: "customer",
+};
 
 function RoleBadge({ role }) {
   return (
@@ -17,10 +30,25 @@ function RoleBadge({ role }) {
   );
 }
 
+function getCurrentUserId() {
+  try {
+    const raw = localStorage.getItem("user");
+    return raw ? JSON.parse(raw)?._id : null;
+  } catch {
+    return null;
+  }
+}
+
 export default function AdminUsers() {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [showForm, setShowForm] = useState(false);
+  const [form, setForm] = useState(EMPTY_FORM);
+  const [formError, setFormError] = useState("");
+  const [formLoading, setFormLoading] = useState(false);
+  const [success, setSuccess] = useState("");
+  const currentUserId = getCurrentUserId();
 
   const fetchUsers = async () => {
     setLoading(true);
@@ -45,17 +73,182 @@ export default function AdminUsers() {
       setUsers((prev) =>
         prev.map((u) => (u._id === id ? { ...u, isBlock: res.data.user.isBlock } : u))
       );
+      setSuccess(res.data.message);
     } catch (err) {
       alert(err.response?.data?.message || "Failed to update user.");
     }
   };
 
+  const promoteToAdmin = async (id) => {
+    if (!window.confirm("Promote this user to admin? They will have full admin access.")) {
+      return;
+    }
+    try {
+      const res = await axios.patch(
+        `${API}/${id}/role`,
+        { role: "admin" },
+        { headers: getAuthHeaders() }
+      );
+      setUsers((prev) =>
+        prev.map((u) => (u._id === id ? { ...u, role: res.data.user.role } : u))
+      );
+      setSuccess(res.data.message);
+    } catch (err) {
+      alert(err.response?.data?.message || "Failed to promote user.");
+    }
+  };
+
+  const demoteToCustomer = async (id) => {
+    if (!window.confirm("Remove admin access from this user?")) {
+      return;
+    }
+    try {
+      const res = await axios.patch(
+        `${API}/${id}/role`,
+        { role: "customer" },
+        { headers: getAuthHeaders() }
+      );
+      setUsers((prev) =>
+        prev.map((u) => (u._id === id ? { ...u, role: res.data.user.role } : u))
+      );
+      setSuccess(res.data.message);
+    } catch (err) {
+      alert(err.response?.data?.message || "Failed to update role.");
+    }
+  };
+
+  const handleCreateUser = async (e) => {
+    e.preventDefault();
+    setFormError("");
+    setSuccess("");
+
+    if (!form.firstName || !form.lastName || !form.email || !form.password) {
+      setFormError("All fields are required.");
+      return;
+    }
+    if (form.password.length < 6) {
+      setFormError("Password must be at least 6 characters.");
+      return;
+    }
+
+    setFormLoading(true);
+    try {
+      const res = await axios.post(
+        API,
+        {
+          firstName: form.firstName.trim(),
+          lastName: form.lastName.trim(),
+          email: form.email.trim(),
+          password: form.password,
+          role: form.role,
+        },
+        { headers: getAuthHeaders() }
+      );
+      setForm(EMPTY_FORM);
+      setShowForm(false);
+      setSuccess(res.data.message);
+      await fetchUsers();
+    } catch (err) {
+      setFormError(err.response?.data?.message || "Failed to create user.");
+    } finally {
+      setFormLoading(false);
+    }
+  };
+
   return (
     <div className="p-4 sm:p-6 lg:p-8 min-w-0">
-      <div className="mb-6">
-        <h1 className="text-xl sm:text-2xl font-bold text-slate-800">Users</h1>
-        <p className="text-slate-500 text-sm mt-1">Manage customer and admin accounts</p>
+      <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <h1 className="text-xl sm:text-2xl font-bold text-slate-800">Users</h1>
+          <p className="text-slate-500 text-sm mt-1">Manage customer and admin accounts</p>
+        </div>
+        <button
+          onClick={() => {
+            setShowForm((v) => !v);
+            setFormError("");
+          }}
+          className="inline-flex items-center justify-center gap-2 bg-blue-500 hover:bg-blue-600 text-white text-sm font-semibold px-4 py-2.5 rounded-lg transition"
+        >
+          <HiOutlineUserPlus className="w-5 h-5" />
+          {showForm ? "Cancel" : "Add User"}
+        </button>
       </div>
+
+      {success && (
+        <div className="mb-4 px-4 py-3 bg-green-50 border border-green-200 text-green-700 rounded-lg text-sm">
+          {success}
+        </div>
+      )}
+
+      {showForm && (
+        <form
+          onSubmit={handleCreateUser}
+          className="mb-6 bg-white rounded-xl shadow-sm border border-slate-200 p-5 sm:p-6"
+        >
+          <h2 className="text-lg font-semibold text-slate-800 mb-4">Add new user</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-slate-600 mb-1">First name</label>
+              <input
+                type="text"
+                value={form.firstName}
+                onChange={(e) => setForm({ ...form, firstName: e.target.value })}
+                className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-slate-600 mb-1">Last name</label>
+              <input
+                type="text"
+                value={form.lastName}
+                onChange={(e) => setForm({ ...form, lastName: e.target.value })}
+                className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-slate-600 mb-1">Email</label>
+              <input
+                type="email"
+                value={form.email}
+                onChange={(e) => setForm({ ...form, email: e.target.value })}
+                className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-slate-600 mb-1">Password</label>
+              <input
+                type="password"
+                value={form.password}
+                onChange={(e) => setForm({ ...form, password: e.target.value })}
+                className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-slate-600 mb-1">Role</label>
+              <select
+                value={form.role}
+                onChange={(e) => setForm({ ...form, role: e.target.value })}
+                className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white"
+              >
+                <option value="customer">Customer</option>
+                <option value="admin">Admin</option>
+              </select>
+            </div>
+          </div>
+
+          {formError && (
+            <p className="mt-4 text-sm text-red-600">{formError}</p>
+          )}
+
+          <button
+            type="submit"
+            disabled={formLoading}
+            className="mt-5 bg-blue-500 hover:bg-blue-600 disabled:bg-blue-300 text-white text-sm font-semibold px-5 py-2.5 rounded-lg transition"
+          >
+            {formLoading ? "Creating…" : "Create User"}
+          </button>
+        </form>
+      )}
 
       {error && (
         <div className="mb-4 px-4 py-3 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm flex justify-between">
@@ -70,7 +263,7 @@ export default function AdminUsers() {
         ) : users.length === 0 ? (
           <div className="py-16 text-center text-slate-400 text-sm">No users found.</div>
         ) : (
-          <table className="w-full text-left min-w-[800px]">
+          <table className="w-full text-left min-w-[900px]">
             <thead className="bg-slate-50 text-slate-600 border-b border-slate-200">
               <tr>
                 <th className="px-5 py-3.5 text-xs font-semibold uppercase">Name</th>
@@ -85,6 +278,9 @@ export default function AdminUsers() {
                 <tr key={user._id} className="hover:bg-slate-50">
                   <td className="px-5 py-3.5 text-sm font-medium text-slate-800">
                     {user.firstName} {user.lastName}
+                    {user._id === currentUserId && (
+                      <span className="ml-2 text-xs text-slate-400">(you)</span>
+                    )}
                   </td>
                   <td className="px-5 py-3.5 text-sm text-slate-600">{user.email}</td>
                   <td className="px-5 py-3.5">
@@ -102,30 +298,48 @@ export default function AdminUsers() {
                     </span>
                   </td>
                   <td className="px-5 py-3.5">
-                    {user.role !== "admin" ? (
-                      <button
-                        onClick={() => toggleBlock(user._id)}
-                        className={`text-sm font-medium flex items-center gap-1 ${
-                          user.isBlock
-                            ? "text-green-600 hover:text-green-800"
-                            : "text-red-600 hover:text-red-800"
-                        }`}
-                      >
-                        {user.isBlock ? (
-                          <>
-                            <HiOutlineCheck className="w-4 h-4" />
-                            Unblock
-                          </>
-                        ) : (
-                          <>
-                            <HiOutlineNoSymbol className="w-4 h-4" />
-                            Block
-                          </>
-                        )}
-                      </button>
-                    ) : (
-                      <span className="text-xs text-slate-400">—</span>
-                    )}
+                    <div className="flex flex-wrap items-center gap-3">
+                      {user.role !== "admin" ? (
+                        <>
+                          <button
+                            onClick={() => promoteToAdmin(user._id)}
+                            className="text-sm font-medium text-purple-600 hover:text-purple-800 flex items-center gap-1"
+                          >
+                            <HiOutlineShieldCheck className="w-4 h-4" />
+                            Make admin
+                          </button>
+                          <button
+                            onClick={() => toggleBlock(user._id)}
+                            className={`text-sm font-medium flex items-center gap-1 ${
+                              user.isBlock
+                                ? "text-green-600 hover:text-green-800"
+                                : "text-red-600 hover:text-red-800"
+                            }`}
+                          >
+                            {user.isBlock ? (
+                              <>
+                                <HiOutlineCheck className="w-4 h-4" />
+                                Unblock
+                              </>
+                            ) : (
+                              <>
+                                <HiOutlineNoSymbol className="w-4 h-4" />
+                                Block
+                              </>
+                            )}
+                          </button>
+                        </>
+                      ) : user._id !== currentUserId ? (
+                        <button
+                          onClick={() => demoteToCustomer(user._id)}
+                          className="text-sm font-medium text-slate-600 hover:text-slate-800"
+                        >
+                          Remove admin
+                        </button>
+                      ) : (
+                        <span className="text-xs text-slate-400">—</span>
+                      )}
+                    </div>
                   </td>
                 </tr>
               ))}

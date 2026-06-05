@@ -6,6 +6,7 @@ import LoginPage from '../pages/loginPage'
 import NotFoundPage from '../pages/notFoundPage'
 import AdminPage from '../pages/adminPage'
 import RegisterPage from '../pages/registerPage'
+import ForgotPasswordPage from '../pages/forgotPasswordPage'
 import ProductsPage from '../pages/productsPage'
 import ProductDetailPage from '../pages/productDetailPage'
 import CartPage from '../pages/cartPage'
@@ -76,6 +77,7 @@ function App() {
             <Route path="/checkout" element={<CheckoutPage />} />
             <Route path="/login" element={<GuestRoute><LoginPage /></GuestRoute>} />
             <Route path="/register" element={<GuestRoute><RegisterPage /></GuestRoute>} />
+            <Route path="/forgot-password" element={<GuestRoute><ForgotPasswordPage /></GuestRoute>} />
             <Route path="*" element={<NotFoundPage />} />
           </Route>
         </Routes>
