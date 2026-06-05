@@ -1,12 +1,16 @@
 import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
+import { GoogleLogin } from "@react-oauth/google";
 import {
   HiOutlineEnvelope,
   HiOutlineLockClosed,
   HiOutlineArrowRightOnRectangle,
 } from "react-icons/hi2";
 import { useCart } from "../src/context/CartContext";
+import { GOOGLE_CLIENT_ID, saveSessionAndRedirect } from "../src/lib/auth";
+
+const API = import.meta.env.VITE_BACKEND_URL + "/api/users";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -19,6 +23,10 @@ export default function LoginPage() {
 
   const successMsg = location.state?.message;
 
+  const finishAuth = (token, user) => {
+    saveSessionAndRedirect({ token, user, navigate, location, reloadCart });
+  };
+
   const handleLogin = async () => {
     setError("");
     if (!email || !password) {
@@ -27,24 +35,29 @@ export default function LoginPage() {
     }
     setLoading(true);
     try {
-      const res = await axios.post(
-        import.meta.env.VITE_BACKEND_URL + "/api/users/login",
-        { email, password }
-      );
-      const { token, user } = res.data;
-      localStorage.setItem("token", token);
-      localStorage.setItem("user", JSON.stringify(user));
-      reloadCart();
-      const redirectTo = location.state?.from;
-      if (redirectTo) {
-        navigate(redirectTo);
-      } else if (user.role === "admin") {
-        navigate("/admin");
-      } else {
-        navigate("/");
-      }
+      const res = await axios.post(`${API}/login`, { email, password });
+      finishAuth(res.data.token, res.data.user);
     } catch (err) {
       setError(err.response?.data?.message || "Login failed. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleGoogleSuccess = async (credentialResponse) => {
+    setError("");
+    if (!credentialResponse.credential) {
+      setError("Google sign-in failed. Please try again.");
+      return;
+    }
+    setLoading(true);
+    try {
+      const res = await axios.post(`${API}/google`, {
+        credential: credentialResponse.credential,
+      });
+      finishAuth(res.data.token, res.data.user);
+    } catch (err) {
+      setError(err.response?.data?.message || "Google sign-in failed. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -74,6 +87,28 @@ export default function LoginPage() {
           </div>
         )}
 
+        {GOOGLE_CLIENT_ID && (
+          <div className="mb-6 flex justify-center">
+            <GoogleLogin
+              onSuccess={handleGoogleSuccess}
+              onError={() => setError("Google sign-in was cancelled or failed.")}
+              theme="outline"
+              size="large"
+              text="continue_with"
+              shape="rectangular"
+              width="320"
+            />
+          </div>
+        )}
+
+        {GOOGLE_CLIENT_ID && (
+          <div className="flex items-center gap-3 mb-6">
+            <div className="flex-1 h-px bg-gray-200" />
+            <span className="text-xs text-gray-400 uppercase tracking-wide">or</span>
+            <div className="flex-1 h-px bg-gray-200" />
+          </div>
+        )}
+
         <label className="block text-sm font-medium text-gray-600 mb-1">Email</label>
         <div className="relative mb-4">
           <HiOutlineEnvelope className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -83,6 +118,7 @@ export default function LoginPage() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             onKeyDown={handleKeyDown}
+            disabled={loading}
             className="w-full border border-gray-300 rounded pl-10 pr-3 py-2.5 min-h-11 text-base focus:outline-none focus:ring-2 focus:ring-blue-400"
           />
         </div>
@@ -96,6 +132,7 @@ export default function LoginPage() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             onKeyDown={handleKeyDown}
+            disabled={loading}
             className="w-full border border-gray-300 rounded pl-10 pr-3 py-2.5 min-h-11 text-base focus:outline-none focus:ring-2 focus:ring-blue-400"
           />
         </div>

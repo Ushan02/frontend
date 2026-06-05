@@ -1,7 +1,11 @@
-// pages/registerPage.jsx
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
+import { GoogleLogin } from "@react-oauth/google";
+import { useCart } from "../src/context/CartContext";
+import { GOOGLE_CLIENT_ID, saveSessionAndRedirect } from "../src/lib/auth";
+
+const API = import.meta.env.VITE_BACKEND_URL + "/api/users";
 
 export default function RegisterPage() {
   const [form, setForm] = useState({
@@ -14,6 +18,8 @@ export default function RegisterPage() {
   const [error,   setError]   = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
+  const { reloadCart } = useCart();
 
   const set = (key) => (e) => setForm({ ...form, [key]: e.target.value });
 
@@ -57,6 +63,31 @@ export default function RegisterPage() {
     }
   };
 
+  const handleGoogleSuccess = async (credentialResponse) => {
+    setError("");
+    if (!credentialResponse.credential) {
+      setError("Google sign-in failed. Please try again.");
+      return;
+    }
+    setLoading(true);
+    try {
+      const res = await axios.post(`${API}/google`, {
+        credential: credentialResponse.credential,
+      });
+      saveSessionAndRedirect({
+        token: res.data.token,
+        user: res.data.user,
+        navigate,
+        location,
+        reloadCart,
+      });
+    } catch (err) {
+      setError(err.response?.data?.message || "Google sign-in failed. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleKeyDown = (e) => {
     if (e.key === "Enter") handleRegister();
   };
@@ -71,6 +102,28 @@ export default function RegisterPage() {
         {error && (
           <div className="mb-4 px-4 py-2 bg-red-100 border border-red-300 text-red-700 rounded text-sm">
             {error}
+          </div>
+        )}
+
+        {GOOGLE_CLIENT_ID && (
+          <div className="mb-6 flex justify-center">
+            <GoogleLogin
+              onSuccess={handleGoogleSuccess}
+              onError={() => setError("Google sign-in was cancelled or failed.")}
+              theme="outline"
+              size="large"
+              text="signup_with"
+              shape="rectangular"
+              width="320"
+            />
+          </div>
+        )}
+
+        {GOOGLE_CLIENT_ID && (
+          <div className="flex items-center gap-3 mb-6">
+            <div className="flex-1 h-px bg-gray-200" />
+            <span className="text-xs text-gray-400 uppercase tracking-wide">or</span>
+            <div className="flex-1 h-px bg-gray-200" />
           </div>
         )}
 
