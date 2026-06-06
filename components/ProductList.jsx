@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import {
@@ -6,15 +6,18 @@ import {
   HiOutlineShoppingCart,
   HiOutlineEye,
   HiOutlineTag,
+  HiOutlineChevronLeft,
+  HiOutlineChevronRight,
 } from "react-icons/hi2";
 import { useCart } from "../src/context/CartContext";
 import { formatPrice } from "../src/lib/formatPrice";
 import { getSubCategoryLabel } from "../src/lib/productCategories";
 
 const API = import.meta.env.VITE_BACKEND_URL + "/api/products";
+const PAGE_SIZE = 9;
 
-function buildQueryParams(category, subCategory, filters) {
-  const params = {};
+function buildQueryParams(category, subCategory, filters, page) {
+  const params = { page, limit: PAGE_SIZE };
   if (category) params.category = category;
   if (filters.subCategory?.length) {
     params.subCategory = filters.subCategory.join(",");
@@ -144,10 +147,95 @@ function ProductCard({ product, variant }) {
   );
 }
 
+function Pagination({ page, totalPages, onPageChange }) {
+  if (totalPages <= 1) return null;
+
+  const pages = [];
+  const start = Math.max(1, page - 2);
+  const end = Math.min(totalPages, page + 2);
+
+  for (let i = start; i <= end; i += 1) {
+    pages.push(i);
+  }
+
+  return (
+    <div className="flex flex-wrap items-center justify-center gap-2 mt-8">
+      <button
+        type="button"
+        onClick={() => onPageChange(page - 1)}
+        disabled={page <= 1}
+        className="btn btn-sm btn-outline gap-1 min-w-[2.5rem]"
+        aria-label="Previous page"
+      >
+        <HiOutlineChevronLeft className="w-4 h-4" />
+        Prev
+      </button>
+
+      {start > 1 && (
+        <>
+          <button
+            type="button"
+            onClick={() => onPageChange(1)}
+            className="btn btn-sm btn-ghost min-w-[2.5rem]"
+          >
+            1
+          </button>
+          {start > 2 && <span className="text-base-content/40 px-1">…</span>}
+        </>
+      )}
+
+      {pages.map((n) => (
+        <button
+          key={n}
+          type="button"
+          onClick={() => onPageChange(n)}
+          className={`btn btn-sm min-w-[2.5rem] ${
+            n === page ? "btn-primary" : "btn-ghost"
+          }`}
+        >
+          {n}
+        </button>
+      ))}
+
+      {end < totalPages && (
+        <>
+          {end < totalPages - 1 && <span className="text-base-content/40 px-1">…</span>}
+          <button
+            type="button"
+            onClick={() => onPageChange(totalPages)}
+            className="btn btn-sm btn-ghost min-w-[2.5rem]"
+          >
+            {totalPages}
+          </button>
+        </>
+      )}
+
+      <button
+        type="button"
+        onClick={() => onPageChange(page + 1)}
+        disabled={page >= totalPages}
+        className="btn btn-sm btn-outline gap-1 min-w-[2.5rem]"
+        aria-label="Next page"
+      >
+        Next
+        <HiOutlineChevronRight className="w-4 h-4" />
+      </button>
+    </div>
+  );
+}
+
 export default function ProductList({ category, subCategory, filters }) {
   const [products, setProducts] = useState([]);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const listRef = useRef(null);
+
+  useEffect(() => {
+    setPage(1);
+  }, [category, subCategory, filters]);
 
   const fetchProducts = useCallback(async () => {
     setLoading(true);
@@ -155,20 +243,37 @@ export default function ProductList({ category, subCategory, filters }) {
     try {
       const token = localStorage.getItem("token");
       const headers = token ? { Authorization: `Bearer ${token}` } : {};
-      const params = buildQueryParams(category, subCategory, filters);
+      const params = buildQueryParams(category, subCategory, filters, page);
       const res = await axios.get(API, { headers, params });
-      setProducts(Array.isArray(res.data) ? res.data : []);
+
+      if (Array.isArray(res.data)) {
+        setProducts(res.data);
+        setTotal(res.data.length);
+        setTotalPages(1);
+      } else {
+        setProducts(res.data.products || []);
+        setTotal(res.data.total ?? 0);
+        setTotalPages(res.data.totalPages ?? 1);
+      }
     } catch (err) {
       setError(err.response?.data?.message || "Failed to load products.");
       setProducts([]);
+      setTotal(0);
+      setTotalPages(1);
     } finally {
       setLoading(false);
     }
-  }, [category, subCategory, filters]);
+  }, [category, subCategory, filters, page]);
 
   useEffect(() => {
     fetchProducts();
   }, [fetchProducts]);
+
+  const handlePageChange = (nextPage) => {
+    if (nextPage < 1 || nextPage > totalPages) return;
+    setPage(nextPage);
+    listRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
 
   if (loading) {
     return (
@@ -197,11 +302,14 @@ export default function ProductList({ category, subCategory, filters }) {
   }
 
   return (
-    <div className="flex-1 min-w-0">
+    <div ref={listRef} className="flex-1 min-w-0">
       <p className="text-xs sm:text-sm text-base-content/50 mb-4">
-        {products.length} product{products.length !== 1 ? "s" : ""}
+        Showing {(page - 1) * PAGE_SIZE + 1}–{Math.min(page * PAGE_SIZE, total)} of {total}{" "}
+        product{total !== 1 ? "s" : ""}
+        {totalPages > 1 && ` · Page ${page} of ${totalPages}`}
       </p>
-      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5 sm:gap-6">
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
         {products.map((product) => (
           <ProductCard
             key={product._id}
@@ -210,6 +318,8 @@ export default function ProductList({ category, subCategory, filters }) {
           />
         ))}
       </div>
+
+      <Pagination page={page} totalPages={totalPages} onPageChange={handlePageChange} />
     </div>
   );
 }
