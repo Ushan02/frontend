@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import axios from "axios";
 import { HiOutlineStar, HiOutlineTrash } from "react-icons/hi2";
 import { API_BASE, getAuthHeaders } from "../../src/lib/adminApi";
@@ -22,6 +23,8 @@ export default function AdminReviews() {
   const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [deletingId, setDeletingId] = useState(null);
+  const [successMsg, setSuccessMsg] = useState("");
 
   const fetchReviews = async () => {
     setLoading(true);
@@ -41,12 +44,18 @@ export default function AdminReviews() {
   }, []);
 
   const handleDelete = async (id) => {
-    if (!window.confirm("Delete this review?")) return;
+    if (!window.confirm("Delete this review permanently?")) return;
+    setSuccessMsg("");
+    setDeletingId(id);
     try {
       await axios.delete(`${API}/${id}`, { headers: getAuthHeaders() });
       setReviews((prev) => prev.filter((r) => r._id !== id));
+      setSuccessMsg("Review deleted successfully.");
+      setTimeout(() => setSuccessMsg(""), 3000);
     } catch (err) {
-      alert(err.response?.data?.message || "Failed to delete review.");
+      setError(err.response?.data?.message || "Failed to delete review.");
+    } finally {
+      setDeletingId(null);
     }
   };
 
@@ -59,13 +68,21 @@ export default function AdminReviews() {
     <div className="p-4 sm:p-6 lg:p-8 min-w-0">
       <div className="mb-6">
         <h1 className="text-xl sm:text-2xl font-bold text-slate-800">Reviews</h1>
-        <p className="text-slate-500 text-sm mt-1">Customer ratings and feedback</p>
+        <p className="text-slate-500 text-sm mt-1">Product reviews with star ratings and comments</p>
       </div>
 
+      {successMsg && (
+        <div className="mb-4 px-4 py-3 bg-green-50 border border-green-200 text-green-700 rounded-lg text-sm">
+          {successMsg}
+        </div>
+      )}
+
       {error && (
-        <div className="mb-4 px-4 py-3 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm flex justify-between">
+        <div className="mb-4 px-4 py-3 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm flex justify-between gap-3">
           <span>{error}</span>
-          <button onClick={fetchReviews} className="underline">Retry</button>
+          <button type="button" onClick={fetchReviews} className="underline shrink-0">
+            Retry
+          </button>
         </div>
       )}
 
@@ -75,9 +92,10 @@ export default function AdminReviews() {
         ) : reviews.length === 0 ? (
           <div className="py-16 text-center text-slate-400 text-sm">No reviews yet.</div>
         ) : (
-          <table className="w-full text-left min-w-[700px]">
+          <table className="w-full text-left min-w-[860px]">
             <thead className="bg-slate-50 text-slate-600 border-b border-slate-200">
               <tr>
+                <th className="px-5 py-3.5 text-xs font-semibold uppercase">Product</th>
                 <th className="px-5 py-3.5 text-xs font-semibold uppercase">Email</th>
                 <th className="px-5 py-3.5 text-xs font-semibold uppercase">Rating</th>
                 <th className="px-5 py-3.5 text-xs font-semibold uppercase">Comment</th>
@@ -88,6 +106,18 @@ export default function AdminReviews() {
             <tbody className="divide-y divide-slate-100">
               {reviews.map((review) => (
                 <tr key={review._id} className="hover:bg-slate-50">
+                  <td className="px-5 py-3.5 text-sm font-mono text-blue-600 whitespace-nowrap">
+                    {review.productId ? (
+                      <Link
+                        to={`/products/${review.productId}`}
+                        className="hover:underline"
+                      >
+                        {review.productId}
+                      </Link>
+                    ) : (
+                      <span className="text-slate-400">—</span>
+                    )}
+                  </td>
                   <td className="px-5 py-3.5 text-sm text-slate-600">{review.email}</td>
                   <td className="px-5 py-3.5">
                     <StarRating rating={review.rating} />
@@ -100,10 +130,16 @@ export default function AdminReviews() {
                   </td>
                   <td className="px-5 py-3.5">
                     <button
+                      type="button"
                       onClick={() => handleDelete(review._id)}
-                      className="text-red-600 hover:text-red-800 text-sm font-medium flex items-center gap-1"
+                      disabled={deletingId === review._id}
+                      className="btn btn-error btn-sm gap-1 rounded-lg"
                     >
-                      <HiOutlineTrash className="w-4 h-4" />
+                      {deletingId === review._id ? (
+                        <span className="loading loading-spinner loading-xs" />
+                      ) : (
+                        <HiOutlineTrash className="w-4 h-4" />
+                      )}
                       Delete
                     </button>
                   </td>

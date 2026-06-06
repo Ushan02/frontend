@@ -14,6 +14,7 @@ import {
 import { useCart } from "../src/context/CartContext";
 import { getCategoryLabel, getSubCategoryLabel } from "../src/lib/productCategories";
 import { formatPrice } from "../src/lib/formatPrice";
+import ProductReviews from "../components/ProductReviews";
 
 const API = import.meta.env.VITE_BACKEND_URL + "/api/products";
 
@@ -334,6 +335,8 @@ export default function ProductDetailPage() {
             </p>
           </div>
         </div>
+
+        <ProductReviews productId={product.productId} productName={product.productName} />
       </div>
     </div>
   );
