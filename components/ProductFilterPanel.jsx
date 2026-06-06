@@ -129,9 +129,9 @@ export default function ProductFilterPanel({ category, subCategory, onFilterChan
     : [];
 
   return (
-    <aside className="bg-base-100 rounded-2xl border border-base-300 p-4 sm:p-5 shadow-sm w-full lg:w-72 shrink-0">
+    <aside className="card-bg rounded-2xl border border-base-300 p-4 sm:p-5 shadow-[0_10px_36px_rgba(3,4,94,0.13)] w-full lg:w-72 shrink-0">
       <div className="flex items-center justify-between mb-4">
-        <h2 className="font-bold text-base-content">Filters</h2>
+        <h2 className="text-base font-extrabold text-base-content tracking-tight">Filters</h2>
         <button
           type="button"
           onClick={() => setFilters(EMPTY_FILTERS)}

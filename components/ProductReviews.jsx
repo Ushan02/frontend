@@ -171,7 +171,7 @@ export default function ProductReviews({ productId, productName }) {
           </p>
         </div>
         {total > 0 && (
-          <div className="flex items-center gap-3 bg-base-100 rounded-2xl border border-base-300/60 px-4 py-3">
+          <div className="flex items-center gap-3 card-bg rounded-2xl border border-base-300/60 px-4 py-3">
             <span className="text-2xl font-extrabold text-base-content">{average}</span>
             <div>
               <StarDisplay rating={Math.round(average)} />
@@ -184,7 +184,7 @@ export default function ProductReviews({ productId, productName }) {
       </div>
 
       {/* Review form */}
-      <div className="rounded-2xl bg-base-100 border border-base-300/60 p-5 sm:p-6 mb-6">
+      <div className="rounded-2xl card-bg border border-base-300/60 p-5 sm:p-6 mb-6">
         <h3 className="font-bold text-base-content mb-1">Write a review</h3>
         {!token || !user ? (
           <p className="text-sm text-base-content/60">
@@ -246,7 +246,7 @@ export default function ProductReviews({ productId, productName }) {
           <span>{error}</span>
         </div>
       ) : reviews.length === 0 ? (
-        <div className="text-center py-10 rounded-2xl bg-base-100 border border-base-300/50">
+        <div className="text-center py-10 rounded-2xl card-bg border border-base-300/50">
           <HiOutlineStar className="w-10 h-10 mx-auto text-base-content/20 mb-2" />
           <p className="text-sm text-base-content/55">No reviews yet. Be the first to review!</p>
         </div>
@@ -255,7 +255,7 @@ export default function ProductReviews({ productId, productName }) {
           {reviews.map((review) => (
             <li
               key={review._id}
-              className="rounded-2xl bg-base-100 border border-base-300/60 p-5 sm:p-6"
+              className="rounded-2xl card-bg border border-base-300/60 p-5 sm:p-6"
             >
               <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 mb-3">
                 <div className="flex items-center gap-3 min-w-0">

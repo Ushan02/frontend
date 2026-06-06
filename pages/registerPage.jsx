@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 import { GoogleLogin } from "@react-oauth/google";
+import { HiOutlineUserPlus } from "react-icons/hi2";
 import { useCart } from "../src/context/CartContext";
 import { GOOGLE_CLIENT_ID, saveSessionAndRedirect } from "../src/lib/auth";
 
@@ -15,7 +16,7 @@ export default function RegisterPage() {
     password: "",
     confirmPassword: "",
   });
-  const [error,   setError]   = useState("");
+  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
@@ -44,17 +45,12 @@ export default function RegisterPage() {
 
     setLoading(true);
     try {
-      await axios.post(
-        import.meta.env.VITE_BACKEND_URL + "/api/users/",
-        {
-          firstName: form.firstName,
-          lastName:  form.lastName,
-          email:     form.email,
-          password:  form.password,
-          // role defaults to "customer", isBlock defaults to false in model
-        }
-      );
-      // Redirect to login with success message — no auto-login
+      await axios.post(import.meta.env.VITE_BACKEND_URL + "/api/users/", {
+        firstName: form.firstName,
+        lastName: form.lastName,
+        email: form.email,
+        password: form.password,
+      });
       navigate("/login", { state: { message: "Account created! Please sign in." } });
     } catch (err) {
       setError(err.response?.data?.message || "Registration failed. Please try again.");
@@ -93,17 +89,15 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="flex flex-1 flex-col justify-center items-center bg-base-200 px-4 py-8 sm:py-12 min-w-0">
-      <div className="bg-white p-6 sm:p-8 rounded-xl shadow-md w-full max-w-sm">
-        <h1 className="text-xl sm:text-2xl font-bold mb-6 text-center text-gray-800">
+    <div className="auth-shell">
+      <div className="auth-card card-bg">
+        <h1 className="section-title mb-1 text-center flex items-center justify-center gap-2">
+          <HiOutlineUserPlus className="w-7 h-7 text-ocean" />
           Create account
         </h1>
+        <p className="section-subtitle text-center mb-6">Join TechZone and start shopping today.</p>
 
-        {error && (
-          <div className="mb-4 px-4 py-2 bg-red-100 border border-red-300 text-red-700 rounded text-sm">
-            {error}
-          </div>
-        )}
+        {error && <div className="alert-modern-error mb-4">{error}</div>}
 
         {GOOGLE_CLIENT_ID && (
           <div className="mb-6 flex justify-center">
@@ -121,90 +115,76 @@ export default function RegisterPage() {
 
         {GOOGLE_CLIENT_ID && (
           <div className="flex items-center gap-3 mb-6">
-            <div className="flex-1 h-px bg-gray-200" />
-            <span className="text-xs text-gray-400 uppercase tracking-wide">or</span>
-            <div className="flex-1 h-px bg-gray-200" />
+            <div className="flex-1 h-px bg-sky/40" />
+            <span className="text-xs text-base-content/40 uppercase tracking-wide">or</span>
+            <div className="flex-1 h-px bg-sky/40" />
           </div>
         )}
 
         <div className="flex flex-col sm:flex-row gap-3 mb-4">
           <div className="flex-1">
-            <label className="block text-sm font-medium text-gray-600 mb-1">
-              First name
-            </label>
+            <label className="block text-sm font-semibold text-base-content/70 mb-1.5">First name</label>
             <input
               type="text"
               placeholder="Jane"
               value={form.firstName}
               onChange={set("firstName")}
               onKeyDown={handleKeyDown}
-              className="w-full border border-gray-300 rounded px-3 py-2.5 min-h-11 text-base focus:outline-none focus:ring-2 focus:ring-blue-400"
+              className="input-field"
             />
           </div>
           <div className="flex-1">
-            <label className="block text-sm font-medium text-gray-600 mb-1">
-              Last name
-            </label>
+            <label className="block text-sm font-semibold text-base-content/70 mb-1.5">Last name</label>
             <input
               type="text"
               placeholder="Doe"
               value={form.lastName}
               onChange={set("lastName")}
               onKeyDown={handleKeyDown}
-              className="w-full border border-gray-300 rounded px-3 py-2.5 min-h-11 text-base focus:outline-none focus:ring-2 focus:ring-blue-400"
+              className="input-field"
             />
           </div>
         </div>
 
-        <label className="block text-sm font-medium text-gray-600 mb-1">
-          Email
-        </label>
+        <label className="block text-sm font-semibold text-base-content/70 mb-1.5">Email</label>
         <input
           type="email"
           placeholder="you@example.com"
           value={form.email}
           onChange={set("email")}
           onKeyDown={handleKeyDown}
-          className="w-full border border-gray-300 rounded px-3 py-2.5 min-h-11 text-base mb-4 focus:outline-none focus:ring-2 focus:ring-blue-400"
+          className="input-field mb-4"
         />
 
-        <label className="block text-sm font-medium text-gray-600 mb-1">
-          Password
-        </label>
+        <label className="block text-sm font-semibold text-base-content/70 mb-1.5">Password</label>
         <input
           type="password"
           placeholder="••••••••"
           value={form.password}
           onChange={set("password")}
           onKeyDown={handleKeyDown}
-          className="w-full border border-gray-300 rounded px-3 py-2.5 min-h-11 text-base mb-4 focus:outline-none focus:ring-2 focus:ring-blue-400"
+          className="input-field mb-4"
         />
 
-        <label className="block text-sm font-medium text-gray-600 mb-1">
-          Confirm password
-        </label>
+        <label className="block text-sm font-semibold text-base-content/70 mb-1.5">Confirm password</label>
         <input
           type="password"
           placeholder="••••••••"
           value={form.confirmPassword}
           onChange={set("confirmPassword")}
           onKeyDown={handleKeyDown}
-          className="w-full border border-gray-300 rounded px-3 py-2.5 min-h-11 text-base mb-6 focus:outline-none focus:ring-2 focus:ring-blue-400"
+          className="input-field mb-6"
         />
 
-        <button
-          onClick={handleRegister}
-          disabled={loading}
-          className="w-full bg-blue-500 hover:bg-blue-600 disabled:bg-blue-300 text-white font-semibold py-2.5 min-h-11 rounded-lg transition"
-        >
+        <button onClick={handleRegister} disabled={loading} className="btn-brand w-full">
           {loading ? "Creating account…" : "Create account"}
         </button>
 
-        <p className="text-center text-sm text-gray-500 mt-4">
+        <p className="text-center text-sm text-base-content/55 mt-5">
           Already have an account?{" "}
           <span
             onClick={() => navigate("/login")}
-            className="text-blue-500 cursor-pointer hover:underline"
+            className="text-ocean cursor-pointer hover:underline font-semibold"
           >
             Sign in
           </span>

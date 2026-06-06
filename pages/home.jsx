@@ -24,7 +24,7 @@ const categories = [
     title: "Gaming Laptops",
     desc: "High-performance rigs with RTX graphics and fast refresh displays.",
     icon: HiOutlineCpuChip,
-    gradient: "from-violet-600 to-indigo-700",
+    gradient: "from-navy to-ocean",
     link: "/products?section=gaming",
   },
   {
@@ -32,7 +32,7 @@ const categories = [
     title: "Business & Student",
     desc: "Lightweight, reliable laptops for work, study, and everyday use.",
     icon: HiOutlineBriefcase,
-    gradient: "from-sky-600 to-blue-700",
+    gradient: "from-ocean to-cyan",
     link: "/products?section=business_and_student",
   },
   {
@@ -40,7 +40,7 @@ const categories = [
     title: "Accessories",
     desc: "Mice, keyboards, bags, chargers, and everything in between.",
     icon: HiOutlineDeviceTablet,
-    gradient: "from-teal-600 to-emerald-700",
+    gradient: "from-cyan to-sky",
     link: "/products?section=accessories",
   },
 ];
@@ -124,14 +124,14 @@ function FeaturedProductsSection() {
     <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
       <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-8 sm:mb-10">
         <div>
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-primary/10 text-primary mb-3">
+          <span className="section-eyebrow mb-3">
             <HiOutlineSparkles className="w-3.5 h-3.5" />
             Hand-picked for you
           </span>
-          <h2 className="text-2xl sm:text-3xl font-bold text-base-content mb-2">
+          <h2 className="section-title mb-2">
             Featured products
           </h2>
-          <p className="text-sm sm:text-base text-base-content/60 max-w-xl">
+          <p className="section-subtitle max-w-xl">
             Explore our latest laptops and accessories — gaming rigs, business notebooks, and everyday tech.
           </p>
         </div>
@@ -145,21 +145,22 @@ function FeaturedProductsSection() {
       </div>
 
       {loading ? (
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 gap-4 sm:gap-5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
           {Array.from({ length: FEATURED_LIMIT }).map((_, i) => (
             <div
               key={i}
-              className="rounded-2xl bg-base-100 p-2.5 sm:p-3 shadow-[0_3px_16px_rgba(15,23,42,0.06)] animate-pulse"
+              className="rounded-2xl card-bg p-2.5 sm:p-3 shadow-[0_10px_36px_rgba(3,4,94,0.13)] animate-pulse"
             >
-              <div className="aspect-[4/3] rounded-xl bg-base-300 mb-2.5" />
+              <div className="aspect-[5/4] rounded-xl bg-base-300 mb-2.5" />
               <div className="h-2.5 w-14 bg-base-300 rounded mb-1.5" />
               <div className="h-4 w-full bg-base-300 rounded mb-1.5" />
-              <div className="h-3.5 w-2/3 bg-base-300 rounded" />
+              <div className="h-3.5 w-2/3 bg-base-300 rounded mb-2" />
+              <div className="h-8 w-full bg-base-300 rounded-lg" />
             </div>
           ))}
         </div>
       ) : products.length === 0 ? (
-        <div className="text-center py-12 rounded-3xl bg-base-100 border border-base-300/50">
+        <div className="text-center py-12 rounded-3xl card-bg border border-base-300/50">
           <HiOutlineShoppingBag className="w-12 h-12 mx-auto text-base-content/20 mb-3" />
           <p className="text-base-content/60 text-sm">No products yet. Check back soon!</p>
           <Link to="/products" className="btn btn-primary btn-sm rounded-xl mt-4">
@@ -167,13 +168,12 @@ function FeaturedProductsSection() {
           </Link>
         </div>
       ) : (
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 gap-4 sm:gap-5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
           {products.map((product) => (
             <ProductCard
               key={product._id}
               product={product}
               variant={product.subCategory || "all"}
-              compact
             />
           ))}
         </div>
@@ -186,7 +186,7 @@ function HeroLaptopShowcase() {
   return (
     <div className="relative hidden lg:block h-[440px] w-full">
       {/* Ambient glow behind laptops */}
-      <div className="absolute inset-4 rounded-[2.5rem] bg-gradient-to-br from-blue-400/25 via-indigo-500/20 to-violet-600/30 blur-2xl" />
+      <div className="absolute inset-4 rounded-[2.5rem] bg-gradient-to-br from-ocean/30 via-cyan/20 to-sky/25 blur-2xl" />
 
       {heroLaptops.map((laptop, index) => (
         <div
@@ -194,16 +194,15 @@ function HeroLaptopShowcase() {
           className={`absolute ${laptop.className} group`}
           style={{ animationDelay: `${index * 120}ms` }}
         >
-          <div className="relative rounded-3xl overflow-hidden shadow-2xl shadow-indigo-950/40 border border-white/20 backdrop-blur-sm">
-            {/* Blue-tinted backdrop replaces plain white photo background */}
-            <div className="absolute inset-0 bg-gradient-to-br from-blue-700 via-indigo-800 to-violet-900 z-0" />
+          <div className="relative rounded-3xl overflow-hidden shadow-2xl shadow-navy/40 border border-white/20 backdrop-blur-sm">
+            <div className="absolute inset-0 bg-gradient-to-br from-navy via-ocean to-cyan z-0" />
             <img
               src={laptop.src}
               alt={laptop.alt}
               className="relative z-10 w-full aspect-[4/3] object-cover object-center mix-blend-luminosity opacity-90 group-hover:opacity-100 group-hover:mix-blend-normal transition-all duration-500"
             />
-            <div className="absolute inset-0 z-20 bg-gradient-to-t from-indigo-900/80 via-blue-800/35 to-transparent pointer-events-none" />
-            <div className="absolute inset-0 z-20 bg-gradient-to-br from-primary/50 via-transparent to-violet-900/40 pointer-events-none mix-blend-multiply" />
+            <div className="absolute inset-0 z-20 bg-gradient-to-t from-navy/80 via-ocean/35 to-transparent pointer-events-none" />
+            <div className="absolute inset-0 z-20 bg-gradient-to-br from-cyan/40 via-transparent to-navy/30 pointer-events-none mix-blend-multiply" />
             <span className="absolute bottom-4 left-4 z-30 px-3 py-1 rounded-full text-xs font-semibold bg-white/15 backdrop-blur-md border border-white/25 text-white">
               {laptop.label}
             </span>
@@ -219,9 +218,9 @@ function HeroLaptopShowcase() {
 
 export default function HomePage() {
   return (
-    <div className="flex-1 bg-base-200 min-w-0">
+    <div className="page-shell flex-1 min-w-0">
       {/* Hero */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-primary via-blue-600 to-indigo-800 text-primary-content">
+      <section className="relative overflow-hidden bg-gradient-to-br from-navy via-ocean to-cyan text-primary-content">
         <div
           className="absolute inset-0 opacity-20"
           style={{
@@ -231,7 +230,7 @@ export default function HomePage() {
           }}
         />
         <div className="absolute -top-24 -right-24 w-96 h-96 rounded-full bg-white/10 blur-3xl" />
-        <div className="absolute -bottom-32 -left-16 w-80 h-80 rounded-full bg-indigo-400/20 blur-3xl" />
+        <div className="absolute -bottom-32 -left-16 w-80 h-80 rounded-full bg-cyan/20 blur-3xl" />
 
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20 lg:py-24">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-12 items-center">
@@ -243,7 +242,7 @@ export default function HomePage() {
 
               <h1 className="text-4xl sm:text-5xl lg:text-5xl xl:text-6xl font-extrabold leading-[1.1] tracking-tight mb-6">
                 Power your work,
-                <span className="block text-blue-200">play & productivity.</span>
+                <span className="block text-sky">play & productivity.</span>
               </h1>
 
               <p className="text-base sm:text-lg text-primary-content/85 max-w-xl mb-8 leading-relaxed">
@@ -254,7 +253,7 @@ export default function HomePage() {
               <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
                 <Link
                   to="/products"
-                  className="inline-flex items-center justify-center gap-2 bg-white text-primary font-semibold px-7 py-3.5 rounded-2xl hover:bg-blue-50 shadow-lg shadow-black/10 transition-all hover:-translate-y-0.5 min-h-12"
+                  className="inline-flex items-center justify-center gap-2 bg-white text-ocean font-semibold px-7 py-3.5 rounded-2xl hover:bg-mist shadow-lg shadow-black/10 transition-all hover:-translate-y-0.5 min-h-12"
                 >
                   <HiOutlineShoppingBag className="w-5 h-5" />
                   Shop all products
@@ -290,13 +289,13 @@ export default function HomePage() {
                 key={laptop.alt}
                 className="relative rounded-2xl overflow-hidden border border-white/20 shadow-xl"
               >
-                <div className="absolute inset-0 bg-gradient-to-br from-blue-700 to-indigo-900" />
+                <div className="absolute inset-0 bg-gradient-to-br from-navy to-ocean" />
                 <img
                   src={laptop.src}
                   alt={laptop.alt}
                   className="relative w-full aspect-[4/3] object-cover mix-blend-luminosity opacity-85"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-indigo-900/70 to-blue-600/30 mix-blend-multiply" />
+                <div className="absolute inset-0 bg-gradient-to-t from-navy/70 to-cyan/30 mix-blend-multiply" />
                 <span className="absolute bottom-2 left-2 text-[10px] font-semibold px-2 py-0.5 rounded-full bg-white/15 text-white border border-white/20">
                   {laptop.label}
                 </span>
@@ -313,7 +312,7 @@ export default function HomePage() {
             <Link
               key={cat.key}
               to={cat.link}
-              className="group relative overflow-hidden rounded-3xl bg-base-100 p-6 sm:p-8 shadow-[0_8px_32px_rgba(15,23,42,0.08)] border border-base-300/60 hover:shadow-[0_20px_48px_rgba(15,23,42,0.12)] hover:-translate-y-1 transition-all duration-300"
+              className="group relative overflow-hidden rounded-3xl card-bg p-6 sm:p-8 shadow-[0_10px_36px_rgba(3,4,94,0.13)] border border-base-300/60 hover:shadow-[0_18px_52px_rgba(3,4,94,0.2)] hover:-translate-y-1 transition-all duration-300"
             >
               <div
                 className={`absolute top-0 right-0 w-32 h-32 rounded-full bg-gradient-to-br ${cat.gradient} opacity-10 group-hover:opacity-20 transition-opacity`}
@@ -343,10 +342,10 @@ export default function HomePage() {
       {/* Highlights */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
         <div className="text-center mb-10 sm:mb-12">
-          <h2 className="text-2xl sm:text-3xl font-bold text-base-content mb-3">
-            Why shop with MyApp
+          <h2 className="section-title mb-3">
+            Why shop with TechZone
           </h2>
-          <p className="text-base-content/60 max-w-lg mx-auto text-sm sm:text-base">
+          <p className="section-subtitle max-w-lg mx-auto">
             A modern shopping experience built for laptops, gear, and everyday tech.
           </p>
         </div>
@@ -355,7 +354,7 @@ export default function HomePage() {
           {highlights.map((item) => (
             <div
               key={item.title}
-              className="rounded-2xl bg-base-100 border border-base-300/50 p-5 sm:p-6 hover:border-primary/30 transition-colors"
+              className="rounded-2xl card-bg border border-base-300/50 p-5 sm:p-6 hover:border-primary/30 transition-colors"
             >
               <div className="w-11 h-11 rounded-xl bg-primary/10 text-primary flex items-center justify-center mb-4">
                 <item.icon className="w-6 h-6" />
@@ -369,18 +368,18 @@ export default function HomePage() {
 
       {/* CTA */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-14 sm:pb-20">
-        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-slate-900 to-slate-800 text-white px-6 sm:px-12 py-12 sm:py-16 text-center">
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-primary/30 via-transparent to-transparent" />
+        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-navy via-ocean to-cyan text-white px-6 sm:px-12 py-12 sm:py-16 text-center">
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-white/15 via-transparent to-transparent" />
           <div className="relative max-w-2xl mx-auto">
-            <h2 className="text-2xl sm:text-3xl font-bold mb-4">
+            <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight mb-4">
               Ready to find your next laptop?
             </h2>
-            <p className="text-slate-300 mb-8 text-sm sm:text-base">
+            <p className="text-white/75 mb-8 text-sm sm:text-base">
               Filter by brand, processor, GPU, and price — only 9 products per page for easy browsing.
             </p>
             <Link
               to="/products"
-              className="inline-flex items-center gap-2 bg-primary hover:bg-primary/90 text-primary-content font-semibold px-8 py-3.5 rounded-2xl transition-all hover:-translate-y-0.5 shadow-lg min-h-12"
+              className="inline-flex items-center gap-2 bg-white text-ocean font-semibold px-8 py-3.5 rounded-2xl transition-all hover:bg-mist hover:-translate-y-0.5 shadow-lg min-h-12"
             >
               <HiOutlineShoppingBag className="w-5 h-5" />
               Start shopping

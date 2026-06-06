@@ -1,6 +1,8 @@
 import { BrowserRouter, Routes, Route, Navigate, Outlet } from 'react-router-dom'
 import './App.css'
 import Header from '../components/header'
+import Footer from '../components/footer'
+import ScrollToTop from '../components/ScrollToTop'
 import HomePage from '../pages/home'
 import LoginPage from '../pages/loginPage'
 import NotFoundPage from '../pages/notFoundPage'
@@ -49,17 +51,21 @@ function GuestRoute({ children }) {
 
 function PageLayout() {
   return (
-    <main className="flex-1 flex flex-col min-h-0 min-w-0 overflow-x-hidden">
-      <Outlet />
-    </main>
+    <div className="flex-1 flex flex-col min-h-0 min-w-0 overflow-x-hidden">
+      <main className="flex-1 flex flex-col min-h-0 min-w-0">
+        <Outlet />
+      </main>
+      <Footer />
+    </div>
   );
 }
 
 function App() {
   return (
     <BrowserRouter>
+      <ScrollToTop />
       <CartProvider>
-      <div className="min-h-screen flex flex-col min-w-0 overflow-x-hidden bg-base-200">
+      <div className="min-h-screen flex flex-col min-w-0 overflow-x-hidden bg-white">
         <Header />
         <div className="flex-1 flex flex-col min-w-0 pt-16">
         <Routes>

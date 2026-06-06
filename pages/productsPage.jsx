@@ -36,34 +36,38 @@ export default function ProductsPage() {
   }, []);
 
   return (
-    <div className="flex-1 bg-base-200 min-w-0">
-      <section className="bg-gradient-to-r from-primary to-blue-700 text-primary-content py-10 sm:py-14 px-4 sm:px-6">
-        <div className="max-w-7xl mx-auto text-center">
-          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2 sm:mb-3 flex items-center justify-center gap-2 sm:gap-3">
+    <div className="page-shell flex-1 min-w-0">
+      <section className="page-hero py-12 sm:py-16 px-4 sm:px-6">
+        <div className="page-hero-inner max-w-7xl mx-auto text-center">
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-white/15 border border-white/20 mb-4">
+            <HiOutlineShoppingBag className="w-3.5 h-3.5" />
+            Shop
+          </span>
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold tracking-tight mb-2 sm:mb-3 flex items-center justify-center gap-2 sm:gap-3">
             <HiOutlineShoppingBag className="w-7 h-7 sm:w-9 sm:h-9 shrink-0" />
             <span>Our Products</span>
           </h1>
-          <p className="text-sm sm:text-base text-primary-content/80 max-w-xl mx-auto">
+          <p className="text-sm sm:text-base text-white/80 max-w-xl mx-auto">
             Browse all laptops and accessories — search by ID or name, then filter results.
           </p>
         </div>
       </section>
 
-      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-6 sm:py-10 w-full min-w-0">
+      <div className="page-container py-6 sm:py-10 w-full min-w-0">
         <div className="relative mb-6">
-          <HiOutlineMagnifyingGlass className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-base-content/40 pointer-events-none" />
+          <HiOutlineMagnifyingGlass className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-base-content/35 pointer-events-none" />
           <input
             type="search"
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
             placeholder="Search by product ID or name…"
-            className="input input-bordered w-full pl-12 pr-12 rounded-2xl bg-base-100 min-h-12"
+            className="search-field"
           />
           {searchInput && (
             <button
               type="button"
               onClick={() => setSearchInput("")}
-              className="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 rounded-lg hover:bg-base-200 text-base-content/50"
+              className="absolute right-3 top-1/2 -translate-y-1/2 p-2 rounded-xl hover:bg-mist text-base-content/45 transition"
               aria-label="Clear search"
             >
               <HiOutlineXMark className="w-5 h-5" />
@@ -77,11 +81,7 @@ export default function ProductsPage() {
               key={tab.key}
               type="button"
               onClick={() => setActiveSection(tab.key)}
-              className={`px-4 sm:px-5 py-2.5 rounded-full text-sm font-semibold transition-all min-h-11 ${
-                activeSection === tab.key
-                  ? "bg-primary text-primary-content shadow-md"
-                  : "bg-base-100 text-base-content/70 border border-base-300 hover:border-primary hover:text-primary"
-              }`}
+              className={`pill-tab ${activeSection === tab.key ? "pill-tab-active" : ""}`}
             >
               {tab.label}
             </button>

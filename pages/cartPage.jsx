@@ -8,6 +8,11 @@ import {
 } from "react-icons/hi2";
 import { useCart } from "../src/context/CartContext";
 import { formatPrice } from "../src/lib/formatPrice";
+import { getDiscountPercent } from "../src/lib/discount";
+import DiscountBadge from "../components/DiscountBadge";
+
+const cartCardClass =
+  "card-bg shadow-[0_10px_36px_rgba(3,4,94,0.13)] hover:shadow-[0_16px_48px_rgba(3,4,94,0.18)] transition-shadow overflow-hidden";
 
 export default function CartPage() {
   const { items, subtotal, cartCount, updateQuantity, removeFromCart, clearCart } =
@@ -15,7 +20,7 @@ export default function CartPage() {
 
   if (items.length === 0) {
     return (
-      <div className="flex-1 flex flex-col items-center justify-center px-6 py-20 bg-base-200">
+      <div className="page-shell flex-1 flex flex-col items-center justify-center px-6 py-20">
         <HiOutlineShoppingCart className="w-20 h-20 text-base-content/20 mb-4" />
         <h1 className="text-2xl font-bold text-base-content">Your cart is empty</h1>
         <p className="text-base-content/60 mt-2 mb-6">Add products to get started.</p>
@@ -28,11 +33,11 @@ export default function CartPage() {
   }
 
   return (
-    <div className="flex-1 bg-base-200 min-w-0">
-      <div className="max-w-4xl mx-auto px-3 sm:px-6 py-6 sm:py-10 w-full">
+    <div className="page-shell flex-1 min-w-0">
+      <div className="page-container max-w-4xl py-6 sm:py-10 w-full">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6 sm:mb-8">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-bold flex items-center gap-2">
+            <h1 className="section-title flex items-center gap-2">
               <HiOutlineShoppingCart className="w-8 h-8 text-primary" />
               Shopping Cart
             </h1>
@@ -50,15 +55,14 @@ export default function CartPage() {
         </div>
 
         <div className="space-y-4">
-          {items.map((item) => (
-            <div
-              key={item.productId}
-              className="card bg-base-100 shadow-sm border border-base-200/80"
-            >
-              <div className="card-body p-3 sm:p-5 flex flex-col sm:flex-row gap-3 sm:gap-4">
+          {items.map((item) => {
+            const itemDiscount = getDiscountPercent(item.labeledPrice, item.price);
+            return (
+            <div key={item.productId} className={cartCardClass}>
+              <div className="p-3 sm:p-5 flex flex-col sm:flex-row gap-3 sm:gap-4">
                 <Link
                   to={`/products/${item.productId}`}
-                  className="shrink-0 w-24 h-24 sm:w-28 sm:h-28 rounded-xl overflow-hidden bg-base-200"
+                  className="shrink-0 w-24 h-24 sm:w-28 sm:h-28 rounded-xl overflow-hidden bg-slate-50 border border-sky/30"
                 >
                   {item.image ? (
                     <img
@@ -83,12 +87,19 @@ export default function CartPage() {
                   <p className="text-xs text-base-content/50 font-mono mt-0.5">
                     {item.productId}
                   </p>
-                  <p className="text-lg font-bold text-primary mt-auto pt-2">
-                    {formatPrice(item.price * item.quantity)}
-                    <span className="text-sm font-normal text-base-content/50 ml-1">
-                      ({formatPrice(item.price)} each)
-                    </span>
-                  </p>
+                  <div className="mt-auto pt-2">
+                    {itemDiscount > 0 && (
+                      <div className="mb-1.5">
+                        <DiscountBadge percent={itemDiscount} size="sm" />
+                      </div>
+                    )}
+                    <p className="text-lg font-bold text-primary">
+                      {formatPrice(item.price * item.quantity)}
+                      <span className="text-sm font-normal text-base-content/50 ml-1">
+                        ({formatPrice(item.price)} each)
+                      </span>
+                    </p>
+                  </div>
                 </div>
 
                 <div className="flex flex-row sm:flex-col items-center sm:items-end justify-between gap-2">
@@ -122,17 +133,18 @@ export default function CartPage() {
                 </div>
               </div>
             </div>
-          ))}
+          );
+          })}
         </div>
 
-        <div className="card bg-base-100 shadow-md border border-base-200/80 mt-8">
-          <div className="card-body">
+        <div className={`${cartCardClass} mt-8 shadow-[0_12px_40px_rgba(3,4,94,0.15)]`}>
+          <div className="p-5 sm:p-6">
             <div className="flex justify-between text-lg">
               <span className="font-medium">Subtotal</span>
               <span className="font-bold text-primary">{formatPrice(subtotal)}</span>
             </div>
             <p className="text-xs text-base-content/50">Shipping and taxes calculated at checkout.</p>
-            <div className="card-actions flex-col sm:flex-row gap-2 mt-4">
+            <div className="flex flex-col sm:flex-row gap-2 mt-4">
               <Link to="/checkout" className="btn btn-primary flex-1">
                 Proceed to checkout
               </Link>

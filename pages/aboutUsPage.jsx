@@ -19,10 +19,13 @@ import {
   HiOutlinePaperAirplane,
 } from "react-icons/hi2";
 
+import {
+  CONTACT_EMAIL,
+  CONTACT_PHONE,
+  CONTACT_ADDRESS,
+} from "../src/lib/contactInfo";
+
 const CONTACT_API = import.meta.env.VITE_BACKEND_URL + "/api/contact";
-const CONTACT_EMAIL = "support@myapp.lk";
-const CONTACT_PHONE = "+94 11 000 0000";
-const CONTACT_ADDRESS = "123 Tech Street, Colombo 03, Sri Lanka";
 
 const contactDetails = [
   {
@@ -120,7 +123,7 @@ function ContactForm() {
 
   if (submitted) {
     return (
-      <div className="rounded-3xl bg-base-100 border border-base-300/60 p-6 sm:p-8 flex flex-col items-center justify-center text-center min-h-[320px]">
+      <div className="rounded-3xl card-bg border border-base-300/60 p-6 sm:p-8 flex flex-col items-center justify-center text-center min-h-[320px]">
         <div className="w-14 h-14 rounded-2xl bg-success/10 text-success flex items-center justify-center mb-4">
           <HiOutlinePaperAirplane className="w-7 h-7" />
         </div>
@@ -142,7 +145,7 @@ function ContactForm() {
   return (
     <form
       onSubmit={handleSubmit}
-      className="rounded-3xl bg-base-100 border border-base-300/60 p-6 sm:p-8 shadow-[0_8px_32px_rgba(15,23,42,0.06)]"
+      className="rounded-3xl card-bg border border-base-300/60 p-6 sm:p-8 shadow-[0_10px_36px_rgba(3,4,94,0.13)]"
     >
       <h3 className="text-lg font-bold text-base-content mb-1">Send us a message</h3>
       <p className="text-sm text-base-content/55 mb-6">
@@ -163,7 +166,7 @@ function ContactForm() {
             value={form.name}
             onChange={set("name")}
             placeholder="Your name"
-            className="input input-bordered rounded-xl w-full"
+            className="input-field"
           />
         </label>
         <label className="form-control w-full">
@@ -173,7 +176,7 @@ function ContactForm() {
             value={form.email}
             onChange={set("email")}
             placeholder="you@example.com"
-            className="input input-bordered rounded-xl w-full"
+            className="input-field"
           />
         </label>
       </div>
@@ -196,14 +199,14 @@ function ContactForm() {
           onChange={set("message")}
           placeholder="How can we help you?"
           rows={5}
-          className="textarea textarea-bordered rounded-xl w-full resize-none"
+          className="input-field resize-none min-h-[8rem]"
         />
       </label>
 
       <button
         type="submit"
         disabled={loading}
-        className="btn btn-primary w-full sm:w-auto rounded-xl gap-2 min-h-11"
+        className="btn-brand w-full sm:w-auto"
       >
         {loading ? (
           <span className="loading loading-spinner loading-sm" />
@@ -218,9 +221,9 @@ function ContactForm() {
 
 export default function AboutUsPage() {
   return (
-    <div className="flex-1 bg-base-200 min-w-0">
+    <div className="page-shell flex-1 min-w-0">
       {/* Hero */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-primary via-blue-600 to-indigo-800 text-primary-content">
+      <section className="relative overflow-hidden bg-gradient-to-br from-navy via-ocean to-cyan text-primary-content">
         <div
           className="absolute inset-0 opacity-20"
           style={{
@@ -234,7 +237,7 @@ export default function AboutUsPage() {
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14 sm:py-20 text-center">
           <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/15 backdrop-blur-sm text-sm font-medium border border-white/20 mb-6">
             <HiOutlineSparkles className="w-4 h-4" />
-            About MyApp
+            About TechZone
           </span>
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold leading-tight mb-4 flex items-center justify-center gap-3 flex-wrap">
             <HiOutlineBuildingOffice2 className="w-9 h-9 sm:w-10 sm:h-10 shrink-0" />
@@ -251,9 +254,9 @@ export default function AboutUsPage() {
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-14 items-center">
           <div>
-            <h2 className="text-2xl sm:text-3xl font-bold text-base-content mb-4">Our story</h2>
+            <h2 className="section-title mb-4">Our story</h2>
             <p className="text-base-content/70 leading-relaxed mb-4">
-              MyApp started with a simple idea: buying a laptop in Sri Lanka should feel clear,
+              TechZone started with a simple idea: buying a laptop in Sri Lanka should feel clear,
               not confusing. Too many stores hide specs, mix up pricing, or make it hard to compare
               gaming machines with everyday work notebooks.
             </p>
@@ -268,7 +271,7 @@ export default function AboutUsPage() {
             </p>
           </div>
 
-          <div className="rounded-3xl bg-base-100 border border-base-300/60 p-6 sm:p-8 shadow-[0_8px_32px_rgba(15,23,42,0.08)]">
+          <div className="rounded-3xl card-bg border border-base-300/60 p-6 sm:p-8 shadow-[0_10px_36px_rgba(3,4,94,0.13)]">
             <div className="flex items-center gap-3 mb-6">
               <div className="w-12 h-12 rounded-2xl bg-primary/10 text-primary flex items-center justify-center">
                 <HiOutlineUsers className="w-6 h-6" />
@@ -296,7 +299,7 @@ export default function AboutUsPage() {
       </section>
 
       {/* Stats */}
-      <section className="bg-base-100 border-y border-base-300/50">
+      <section className="bg-mist/30 border-y border-sky/30">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-12">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
             {milestones.map((item) => (
@@ -312,8 +315,8 @@ export default function AboutUsPage() {
       {/* Values */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
         <div className="text-center mb-10 sm:mb-12">
-          <h2 className="text-2xl sm:text-3xl font-bold text-base-content mb-3">What we stand for</h2>
-          <p className="text-base-content/60 max-w-lg mx-auto text-sm sm:text-base">
+          <h2 className="section-title mb-3">What we stand for</h2>
+          <p className="section-subtitle max-w-lg mx-auto">
             Four principles guide every product we list and every order we fulfill.
           </p>
         </div>
@@ -322,7 +325,7 @@ export default function AboutUsPage() {
           {values.map((item) => (
             <div
               key={item.title}
-              className="rounded-2xl bg-base-100 border border-base-300/50 p-5 sm:p-6 hover:border-primary/30 transition-colors"
+              className="rounded-2xl card-bg border border-base-300/50 p-5 sm:p-6 hover:border-primary/30 transition-colors"
             >
               <div className="w-11 h-11 rounded-xl bg-primary/10 text-primary flex items-center justify-center mb-4">
                 <item.icon className="w-6 h-6" />
@@ -335,15 +338,15 @@ export default function AboutUsPage() {
       </section>
 
       {/* Contact Us */}
-      <section id="contact-us" className="bg-base-100 border-t border-base-300/50">
+      <section id="contact-us" className="bg-mist/30 border-t border-sky/30">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
           <div className="text-center mb-10 sm:mb-12">
-            <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-primary/10 text-primary mb-4">
+            <span className="section-eyebrow mb-4">
               <HiOutlineChatBubbleLeftRight className="w-4 h-4" />
               We&apos;re here to help
             </span>
-            <h2 className="text-2xl sm:text-3xl font-bold text-base-content mb-3">Contact Us</h2>
-            <p className="text-base-content/60 max-w-lg mx-auto text-sm sm:text-base">
+            <h2 className="section-title mb-3">Contact Us</h2>
+            <p className="section-subtitle max-w-lg mx-auto">
               Reach out for product advice, order support, or partnership inquiries. Our team
               typically responds within one business day.
             </p>
@@ -354,7 +357,7 @@ export default function AboutUsPage() {
               {contactDetails.map((item) => (
                 <div
                   key={item.title}
-                  className="rounded-2xl bg-base-200 border border-base-300/50 p-5 flex gap-4"
+                  className="rounded-2xl card-bg border border-base-300/50 p-5 flex gap-4"
                 >
                   <div className="w-11 h-11 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
                     <item.icon className="w-5 h-5" />
@@ -388,18 +391,18 @@ export default function AboutUsPage() {
 
       {/* CTA */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:pb-20">
-        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-slate-900 to-slate-800 text-white px-6 sm:px-12 py-10 sm:py-14 text-center">
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-primary/30 via-transparent to-transparent" />
+        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-navy via-ocean to-cyan text-white px-6 sm:px-12 py-10 sm:py-14 text-center">
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-white/15 via-transparent to-transparent" />
           <div className="relative max-w-2xl mx-auto">
-            <h2 className="text-xl sm:text-2xl font-bold mb-3">Ready to explore?</h2>
-            <p className="text-slate-300 mb-6 text-sm sm:text-base">
+            <h2 className="text-xl sm:text-2xl font-extrabold tracking-tight mb-3">Ready to explore?</h2>
+            <p className="text-white/75 mb-6 text-sm sm:text-base">
               Browse gaming laptops, business notebooks, and accessories — filter by brand,
               specs, and price in RS.
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <Link
                 to="/products"
-                className="inline-flex items-center justify-center gap-2 bg-primary hover:bg-primary/90 text-primary-content font-semibold px-6 py-3 rounded-2xl transition-all hover:-translate-y-0.5 shadow-lg min-h-11"
+                className="inline-flex items-center justify-center gap-2 bg-white text-ocean font-semibold px-6 py-3 rounded-2xl transition-all hover:bg-mist hover:-translate-y-0.5 shadow-lg min-h-11"
               >
                 <HiOutlineShoppingBag className="w-5 h-5" />
                 Shop products

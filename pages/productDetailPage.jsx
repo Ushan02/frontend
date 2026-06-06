@@ -15,6 +15,8 @@ import { useCart } from "../src/context/CartContext";
 import { getCategoryLabel, getSubCategoryLabel } from "../src/lib/productCategories";
 import { formatPrice } from "../src/lib/formatPrice";
 import ProductReviews from "../components/ProductReviews";
+import DiscountBadge from "../components/DiscountBadge";
+import { getDiscountPercent } from "../src/lib/discount";
 
 const API = import.meta.env.VITE_BACKEND_URL + "/api/products";
 
@@ -72,10 +74,8 @@ export default function ProductDetailPage() {
   const stock = Number(product.stock ?? 0);
   const outOfStock = stock === 0;
   const canBuy = product.isAvailable && !outOfStock;
-  const onSale = Number(product.labeledPrice) > Number(product.price);
-  const discount = onSale
-    ? Math.round((1 - product.price / product.labeledPrice) * 100)
-    : 0;
+  const discount = getDiscountPercent(product.labeledPrice, product.price);
+  const onSale = discount > 0;
 
   const handleAddToCart = () => {
     if (outOfStock) {
@@ -116,7 +116,7 @@ export default function ProductDetailPage() {
   };
 
   return (
-    <div className="flex-1 bg-base-200 min-w-0">
+    <div className="page-shell flex-1 min-w-0">
       <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-5 sm:py-8 w-full min-w-0">
         <Link
           to="/products"
@@ -129,8 +129,15 @@ export default function ProductDetailPage() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-10 lg:gap-14">
           {/* Gallery */}
           <div className="space-y-4">
-            <div className="card bg-base-100 shadow-xl overflow-hidden border border-base-200/80">
-              <figure className="aspect-square bg-base-200">
+            <div className="card card-bg shadow-xl overflow-hidden relative">
+              {onSale && (
+                <DiscountBadge
+                  percent={discount}
+                  size="lg"
+                  className="absolute top-4 right-4 z-10"
+                />
+              )}
+              <figure className="aspect-square bg-slate-50 border-b border-sky/30">
                 {images[activeImage] ? (
                   <img
                     src={images[activeImage]}
@@ -190,18 +197,21 @@ export default function ProductDetailPage() {
               </p>
             )}
 
-            <div className="flex items-center gap-2 sm:gap-3 mt-4 sm:mt-6 flex-wrap">
-              {onSale && (
-                <>
-                  <span className="text-lg sm:text-2xl text-base-content/40 line-through">
-                    {formatPrice(product.labeledPrice)}
-                  </span>
-                  <span className="badge badge-error badge-sm">Save {discount}%</span>
-                </>
-              )}
-              <span className="text-3xl sm:text-4xl font-bold text-primary">
+            {onSale && (
+              <div className="mt-4 sm:mt-6">
+                <DiscountBadge percent={discount} size="lg" label={`Save ${discount}%`} />
+              </div>
+            )}
+
+            <div className="flex items-end gap-2 sm:gap-3 mt-3 flex-wrap">
+              <span className="text-3xl sm:text-4xl font-extrabold text-primary">
                 {formatPrice(product.price)}
               </span>
+              {onSale && (
+                <span className="text-lg sm:text-2xl text-base-content/40 line-through pb-1">
+                  {formatPrice(product.labeledPrice)}
+                </span>
+              )}
             </div>
 
             {product.category === "laptop" && product.specs && (
