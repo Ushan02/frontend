@@ -34,7 +34,7 @@ function buildQueryParams(category, subCategory, filters, page) {
   return params;
 }
 
-function ProductCard({ product, variant }) {
+export function ProductCard({ product, variant, compact = false }) {
   const { addToCart } = useCart();
   const image = product.images?.[0];
   const stock = Number(product.stock ?? 0);
@@ -52,9 +52,26 @@ function ProductCard({ product, variant }) {
     if (canBuy) addToCart(product, 1);
   };
 
+  const showGamingSpecs =
+    !compact && (variant === "gaming" || product.subCategory === "gaming") && specs.processorModel;
+  const showBusinessSpecs =
+    !compact &&
+    (variant === "business_and_student" || product.subCategory === "business_and_student") &&
+    specs.processorModel;
+
   return (
-    <article className="group flex flex-col w-full min-w-0 rounded-[1.75rem] bg-base-100 p-3 sm:p-4 shadow-[0_4px_24px_rgba(15,23,42,0.06)] hover:shadow-[0_20px_48px_rgba(15,23,42,0.12)] hover:-translate-y-1 transition-all duration-300">
-      <div className="relative aspect-square rounded-2xl overflow-hidden bg-gradient-to-br from-base-200 to-base-300">
+    <article
+      className={`group flex flex-col w-full min-w-0 bg-base-100 transition-all duration-300 ${
+        compact
+          ? "rounded-2xl p-2.5 sm:p-3 shadow-[0_3px_16px_rgba(15,23,42,0.06)] hover:shadow-[0_12px_32px_rgba(15,23,42,0.1)] hover:-translate-y-0.5"
+          : "rounded-[1.75rem] p-3 sm:p-4 shadow-[0_4px_24px_rgba(15,23,42,0.06)] hover:shadow-[0_20px_48px_rgba(15,23,42,0.12)] hover:-translate-y-1"
+      }`}
+    >
+      <div
+        className={`relative overflow-hidden bg-gradient-to-br from-base-200 to-base-300 ${
+          compact ? "aspect-[4/3] rounded-xl" : "aspect-square rounded-2xl"
+        }`}
+      >
         <Link to={`/products/${product.productId}`} className="block h-full">
           {image ? (
             <img
@@ -66,69 +83,94 @@ function ProductCard({ product, variant }) {
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center text-base-content/20">
-              <HiOutlineShoppingBag className="w-16 h-16" />
+              <HiOutlineShoppingBag className={compact ? "w-12 h-12" : "w-16 h-16"} />
             </div>
           )}
         </Link>
 
         {onSale && !outOfStock && (
-          <span className="absolute top-3 left-3 px-2.5 py-1 rounded-full text-[10px] font-bold bg-white/90 text-rose-600 shadow-lg flex items-center gap-1">
-            <HiOutlineTag className="w-3 h-3" />
+          <span
+            className={`absolute font-bold bg-white/90 text-rose-600 shadow-lg flex items-center gap-1 ${
+              compact
+                ? "top-2 left-2 px-1.5 py-0.5 rounded-full text-[9px]"
+                : "top-3 left-3 px-2.5 py-1 rounded-full text-[10px]"
+            }`}
+          >
+            <HiOutlineTag className={compact ? "w-2.5 h-2.5" : "w-3 h-3"} />
             {discount}% OFF
           </span>
         )}
 
-        <div className="absolute bottom-3 right-3 flex gap-2 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
-          <Link
-            to={`/products/${product.productId}`}
-            className="flex items-center justify-center w-10 h-10 rounded-full bg-white/95 text-base-content shadow-lg"
-          >
-            <HiOutlineEye className="w-5 h-5" />
-          </Link>
-          <button
-            type="button"
-            onClick={handleQuickAdd}
-            disabled={!canBuy}
-            className="flex items-center justify-center w-10 h-10 rounded-full bg-primary text-primary-content shadow-lg disabled:opacity-50"
-          >
-            <HiOutlineShoppingCart className="w-5 h-5" />
-          </button>
-        </div>
+        {!compact && (
+          <div className="absolute bottom-3 right-3 flex gap-2 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
+            <Link
+              to={`/products/${product.productId}`}
+              className="flex items-center justify-center w-10 h-10 rounded-full bg-white/95 text-base-content shadow-lg"
+            >
+              <HiOutlineEye className="w-5 h-5" />
+            </Link>
+            <button
+              type="button"
+              onClick={handleQuickAdd}
+              disabled={!canBuy}
+              className="flex items-center justify-center w-10 h-10 rounded-full bg-primary text-primary-content shadow-lg disabled:opacity-50"
+            >
+              <HiOutlineShoppingCart className="w-5 h-5" />
+            </button>
+          </div>
+        )}
       </div>
 
-      <div className="flex flex-col flex-1 gap-2 px-1 pt-4">
-        <p className="text-[10px] font-semibold text-primary/80 uppercase tracking-widest">
+      <div className={`flex flex-col flex-1 ${compact ? "gap-1.5 pt-2.5 px-0.5" : "gap-2 px-1 pt-4"}`}>
+        <p
+          className={`font-semibold text-primary/80 uppercase tracking-widest ${
+            compact ? "text-[10px]" : "text-[10px]"
+          }`}
+        >
           {product.brand}
         </p>
         <Link to={`/products/${product.productId}`}>
-          <h2 className="text-base sm:text-lg font-bold line-clamp-2 group-hover:text-primary transition-colors">
+          <h2
+            className={`font-bold group-hover:text-primary transition-colors ${
+              compact
+                ? "text-sm sm:text-base line-clamp-2"
+                : "text-base sm:text-lg line-clamp-2"
+            }`}
+          >
             {product.productName}
           </h2>
         </Link>
 
-        <p className="text-[10px] text-base-content/45 uppercase tracking-wide">
-          {getSubCategoryLabel(product.subCategory)}
-        </p>
+        {compact ? (
+          <p className="text-[9px] text-base-content/45 uppercase tracking-wide line-clamp-1">
+            {getSubCategoryLabel(product.subCategory)}
+          </p>
+        ) : (
+          <p className="text-[10px] text-base-content/45 uppercase tracking-wide">
+            {getSubCategoryLabel(product.subCategory)}
+          </p>
+        )}
 
-        {(variant === "gaming" || product.subCategory === "gaming") && specs.processorModel && (
+        {showGamingSpecs && (
           <p className="text-xs text-base-content/60">
             {specs.processorModel}
             {specs.gpuModel ? ` · ${specs.gpuModel}` : ""}
           </p>
         )}
 
-        {(variant === "business_and_student" || product.subCategory === "business_and_student") &&
-          specs.processorModel && (
+        {showBusinessSpecs && (
           <p className="text-xs text-base-content/60">
             {specs.processorModel}
             {specs.ram ? ` · ${specs.ram}GB RAM` : ""}
           </p>
         )}
 
-        <div className="flex items-baseline gap-2 mt-auto pt-2">
-          <span className="text-lg sm:text-xl font-extrabold">{formatPrice(product.price)}</span>
+        <div className={`flex items-baseline mt-auto ${compact ? "gap-1.5 pt-1.5" : "gap-2 pt-2"}`}>
+          <span className={compact ? "text-base font-extrabold" : "text-lg sm:text-xl font-extrabold"}>
+            {formatPrice(product.price)}
+          </span>
           {onSale && (
-            <span className="text-sm text-base-content/35 line-through">
+            <span className={compact ? "text-xs text-base-content/35 line-through" : "text-sm text-base-content/35 line-through"}>
               {formatPrice(product.labeledPrice)}
             </span>
           )}
@@ -138,7 +180,7 @@ function ProductCard({ product, variant }) {
           type="button"
           onClick={handleQuickAdd}
           disabled={!canBuy}
-          className="btn btn-sm btn-primary rounded-xl mt-1"
+          className={`btn btn-primary mt-0.5 ${compact ? "btn-sm rounded-xl min-h-8 h-8" : "btn-sm rounded-xl mt-1"}`}
         >
           {outOfStock ? "Sold out" : "Add to bag"}
         </button>

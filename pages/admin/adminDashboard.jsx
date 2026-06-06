@@ -6,28 +6,31 @@ import {
   HiOutlineUsers,
   HiOutlineShoppingCart,
   HiOutlineStar,
+  HiOutlineChatBubbleLeftRight,
 } from "react-icons/hi2";
 import { API_BASE, getAuthHeaders } from "../../src/lib/adminApi";
 
 export default function AdminDashboard() {
-  const [stats, setStats] = useState({ products: 0, users: 0, orders: 0, reviews: 0 });
+  const [stats, setStats] = useState({ products: 0, users: 0, orders: 0, reviews: 0, messages: 0 });
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function load() {
       const headers = getAuthHeaders();
       try {
-        const [products, users, orders, reviews] = await Promise.all([
+        const [products, users, orders, reviews, messages] = await Promise.all([
           axios.get(`${API_BASE}/api/products`, { headers }),
           axios.get(`${API_BASE}/api/users`, { headers }),
           axios.get(`${API_BASE}/api/order`, { headers }),
           axios.get(`${API_BASE}/api/review`, { headers }),
+          axios.get(`${API_BASE}/api/contact`, { headers }),
         ]);
         setStats({
           products: products.data?.length ?? 0,
           users: users.data?.length ?? 0,
           orders: orders.data?.length ?? 0,
           reviews: reviews.data?.length ?? 0,
+          messages: messages.data?.length ?? 0,
         });
       } catch {
         /* keep zeros */
@@ -43,6 +46,7 @@ export default function AdminDashboard() {
     { label: "Users", count: stats.users, to: "/admin/users", Icon: HiOutlineUsers, color: "bg-emerald-500" },
     { label: "Orders", count: stats.orders, to: "/admin/orders", Icon: HiOutlineShoppingCart, color: "bg-amber-500" },
     { label: "Reviews", count: stats.reviews, to: "/admin/reviews", Icon: HiOutlineStar, color: "bg-purple-500" },
+    { label: "Messages", count: stats.messages, to: "/admin/messages", Icon: HiOutlineChatBubbleLeftRight, color: "bg-rose-500" },
   ];
 
   return (
@@ -53,7 +57,7 @@ export default function AdminDashboard() {
       {loading ? (
         <div className="text-slate-400 text-sm">Loading stats…</div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 sm:gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-5 gap-4 sm:gap-6">
           {cards.map(({ label, count, to, Icon, color }) => (
             <Link
               key={label}

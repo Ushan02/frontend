@@ -10,6 +10,7 @@ import {
   HiOutlineShoppingCart,
   HiOutlineBars3,
   HiOutlineXMark,
+  HiOutlineInformationCircle,
 } from "react-icons/hi2";
 import { useCart } from "../src/context/CartContext";
 
@@ -70,6 +71,9 @@ export default function Header() {
       </NavLinkItem>
       <NavLinkItem to="/products" icon={HiOutlineShoppingBag} onClick={closeMenu}>
         Products
+      </NavLinkItem>
+      <NavLinkItem to="/about" icon={HiOutlineInformationCircle} onClick={closeMenu}>
+        About
       </NavLinkItem>
       <Link
         to="/cart"

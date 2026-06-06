@@ -1,12 +1,25 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { HiOutlineShoppingBag } from "react-icons/hi2";
 import ProductFilterPanel from "../components/ProductFilterPanel";
 import ProductList from "../components/ProductList";
 import { SHOP_SECTIONS } from "../src/lib/productCategories";
 
+function getInitialSection(searchParams) {
+  const key = searchParams.get("section");
+  return SHOP_SECTIONS.some((s) => s.key === key) ? key : "all";
+}
+
 export default function ProductsPage() {
-  const [activeSection, setActiveSection] = useState("all");
+  const [searchParams] = useSearchParams();
+  const [activeSection, setActiveSection] = useState(() =>
+    getInitialSection(searchParams)
+  );
   const [filters, setFilters] = useState({});
+
+  useEffect(() => {
+    setActiveSection(getInitialSection(searchParams));
+  }, [searchParams]);
 
   const section =
     SHOP_SECTIONS.find((item) => item.key === activeSection) || SHOP_SECTIONS[0];

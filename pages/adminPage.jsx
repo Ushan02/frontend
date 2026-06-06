@@ -10,6 +10,7 @@ import {
   HiOutlineHome,
   HiOutlineBars3,
   HiOutlineXMark,
+  HiOutlineChatBubbleLeftRight,
 } from "react-icons/hi2";
 import AdminDashboard from "./admin/adminDashboard";
 import AdminProduct from "./admin/adminProduct";
@@ -18,6 +19,7 @@ import EditProduct from "./admin/editProduct";
 import AdminUsers from "./admin/adminUsers";
 import AdminOrders from "./admin/adminOrders";
 import AdminReviews from "./admin/adminReviews";
+import AdminMessages from "./admin/adminMessages";
 
 const navItems = [
   { to: "/admin", label: "Dashboard", Icon: HiOutlineHome, end: true },
@@ -25,6 +27,7 @@ const navItems = [
   { to: "/admin/users", label: "Users", Icon: HiOutlineUsers },
   { to: "/admin/orders", label: "Orders", Icon: HiOutlineShoppingCart },
   { to: "/admin/reviews", label: "Reviews", Icon: HiOutlineStar },
+  { to: "/admin/messages", label: "Messages", Icon: HiOutlineChatBubbleLeftRight },
 ];
 
 function SidebarLink({ to, label, Icon, end, onNavigate }) {
@@ -161,6 +164,7 @@ export default function AdminPage() {
             <Route path="users" element={<AdminUsers />} />
             <Route path="orders" element={<AdminOrders />} />
             <Route path="reviews" element={<AdminReviews />} />
+            <Route path="messages" element={<AdminMessages />} />
             <Route path="*" element={<Navigate to="/admin" replace />} />
           </Routes>
         </main>

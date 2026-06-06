@@ -11,6 +11,7 @@ import ProductsPage from '../pages/productsPage'
 import ProductDetailPage from '../pages/productDetailPage'
 import CartPage from '../pages/cartPage'
 import CheckoutPage from '../pages/checkoutPage'
+import AboutUsPage from '../pages/aboutUsPage'
 import { CartProvider } from './context/CartContext'
 
 // Safely parse stored user
@@ -74,6 +75,7 @@ function App() {
           />
           <Route element={<PageLayout />}>
             <Route path="/" element={<HomePage />} />
+            <Route path="/about" element={<AboutUsPage />} />
             <Route path="/products" element={<ProductsPage />} />
             <Route path="/products/:productId" element={<ProductDetailPage />} />
             <Route path="/cart" element={<CartPage />} />
