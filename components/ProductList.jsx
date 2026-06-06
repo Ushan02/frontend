@@ -16,8 +16,9 @@ import { getSubCategoryLabel } from "../src/lib/productCategories";
 const API = import.meta.env.VITE_BACKEND_URL + "/api/products";
 const PAGE_SIZE = 9;
 
-function buildQueryParams(category, subCategory, filters, page) {
+function buildQueryParams(category, subCategory, filters, page, search) {
   const params = { page, limit: PAGE_SIZE };
+  if (search?.trim()) params.search = search.trim();
   if (category) params.category = category;
   if (filters.subCategory?.length) {
     params.subCategory = filters.subCategory.join(",");
@@ -266,7 +267,7 @@ function Pagination({ page, totalPages, onPageChange }) {
   );
 }
 
-export default function ProductList({ category, subCategory, filters }) {
+export default function ProductList({ category, subCategory, filters, search = "" }) {
   const [products, setProducts] = useState([]);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -277,7 +278,7 @@ export default function ProductList({ category, subCategory, filters }) {
 
   useEffect(() => {
     setPage(1);
-  }, [category, subCategory, filters]);
+  }, [category, subCategory, filters, search]);
 
   const fetchProducts = useCallback(async () => {
     setLoading(true);
@@ -285,7 +286,7 @@ export default function ProductList({ category, subCategory, filters }) {
     try {
       const token = localStorage.getItem("token");
       const headers = token ? { Authorization: `Bearer ${token}` } : {};
-      const params = buildQueryParams(category, subCategory, filters, page);
+      const params = buildQueryParams(category, subCategory, filters, page, search);
       const res = await axios.get(API, { headers, params });
 
       if (Array.isArray(res.data)) {
@@ -305,7 +306,7 @@ export default function ProductList({ category, subCategory, filters }) {
     } finally {
       setLoading(false);
     }
-  }, [category, subCategory, filters, page]);
+  }, [category, subCategory, filters, page, search]);
 
   useEffect(() => {
     fetchProducts();
@@ -338,7 +339,11 @@ export default function ProductList({ category, subCategory, filters }) {
     return (
       <div className="text-center py-16 flex-1">
         <HiOutlineShoppingBag className="w-14 h-14 mx-auto text-base-content/20 mb-4" />
-        <p className="text-base-content/70 font-medium">No products match your filters.</p>
+        <p className="text-base-content/70 font-medium">
+          {search?.trim()
+            ? `No products found for "${search.trim()}".`
+            : "No products match your filters."}
+        </p>
       </div>
     );
   }

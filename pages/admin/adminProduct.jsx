@@ -1,7 +1,13 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
-import { HiOutlinePlus, HiOutlinePencil, HiOutlineTrash } from "react-icons/hi2";
+import {
+  HiOutlinePlus,
+  HiOutlinePencil,
+  HiOutlineTrash,
+  HiOutlineMagnifyingGlass,
+  HiOutlineXMark,
+} from "react-icons/hi2";
 import { getCategoryLabel, getSubCategoryLabel } from "../../src/lib/productCategories";
 import { formatPrice } from "../../src/lib/formatPrice";
 
@@ -84,25 +90,33 @@ function ProductImage({ src, alt }) {
 
 export default function AdminProduct() {
   const [products, setProducts] = useState([]);
-  const [loading, setLoading]   = useState(true);
-  const [error, setError]       = useState("");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [searchInput, setSearchInput] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
 
-  const fetchProducts = async () => {
+  useEffect(() => {
+    const timer = setTimeout(() => setSearchQuery(searchInput.trim()), 350);
+    return () => clearTimeout(timer);
+  }, [searchInput]);
+
+  const fetchProducts = useCallback(async () => {
     setLoading(true);
     setError("");
     try {
-      const res = await axios.get(API, { headers: getAuthHeaders() });
+      const params = searchQuery ? { search: searchQuery } : {};
+      const res = await axios.get(API, { headers: getAuthHeaders(), params });
       setProducts(Array.isArray(res.data) ? res.data : []);
     } catch (err) {
       setError(err.response?.data?.message || "Failed to load products.");
     } finally {
       setLoading(false);
     }
-  };
+  }, [searchQuery]);
 
   useEffect(() => {
     fetchProducts();
-  }, []);
+  }, [fetchProducts]);
 
   const handleDelete = async (productId) => {
     if (!window.confirm(`Delete product "${productId}"?`)) return;
@@ -131,6 +145,27 @@ export default function AdminProduct() {
         </Link>
       </div>
 
+      <div className="relative mb-4 max-w-xl">
+        <HiOutlineMagnifyingGlass className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 pointer-events-none" />
+        <input
+          type="search"
+          value={searchInput}
+          onChange={(e) => setSearchInput(e.target.value)}
+          placeholder="Search by product ID or name…"
+          className="w-full pl-10 pr-10 py-2.5 rounded-lg border border-slate-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-11"
+        />
+        {searchInput && (
+          <button
+            type="button"
+            onClick={() => setSearchInput("")}
+            className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded-md hover:bg-slate-100 text-slate-400"
+            aria-label="Clear search"
+          >
+            <HiOutlineXMark className="w-5 h-5" />
+          </button>
+        )}
+      </div>
+
       {error && (
         <div className="mb-4 px-4 py-3 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm flex items-center justify-between">
           <span>{error}</span>
@@ -150,7 +185,9 @@ export default function AdminProduct() {
           </div>
         ) : products.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16 text-slate-400">
-            <p className="text-sm">No products found.</p>
+            <p className="text-sm">
+              {searchQuery ? `No products match "${searchQuery}".` : "No products found."}
+            </p>
             <Link to="/admin/products/add" className="text-xs mt-2 text-blue-600 hover:underline">
               Add your first product
             </Link>
@@ -236,9 +273,15 @@ export default function AdminProduct() {
         )}
       </div>
 
-      {!loading && products.length > 0 && (
+      {!loading && (
         <p className="text-sm text-slate-400 mt-4">
-          Showing {products.length} product{products.length !== 1 ? "s" : ""}
+          {products.length > 0
+            ? `Showing ${products.length} product${products.length !== 1 ? "s" : ""}${
+                searchQuery ? ` for "${searchQuery}"` : ""
+              }`
+            : searchQuery
+              ? `No results for "${searchQuery}"`
+              : null}
         </p>
       )}
     </div>

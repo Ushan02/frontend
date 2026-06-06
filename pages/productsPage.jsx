@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import { HiOutlineShoppingBag } from "react-icons/hi2";
+import { HiOutlineShoppingBag, HiOutlineMagnifyingGlass, HiOutlineXMark } from "react-icons/hi2";
 import ProductFilterPanel from "../components/ProductFilterPanel";
 import ProductList from "../components/ProductList";
 import { SHOP_SECTIONS } from "../src/lib/productCategories";
@@ -16,6 +16,13 @@ export default function ProductsPage() {
     getInitialSection(searchParams)
   );
   const [filters, setFilters] = useState({});
+  const [searchInput, setSearchInput] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
+
+  useEffect(() => {
+    const timer = setTimeout(() => setSearchQuery(searchInput.trim()), 350);
+    return () => clearTimeout(timer);
+  }, [searchInput]);
 
   useEffect(() => {
     setActiveSection(getInitialSection(searchParams));
@@ -37,12 +44,33 @@ export default function ProductsPage() {
             <span>Our Products</span>
           </h1>
           <p className="text-sm sm:text-base text-primary-content/80 max-w-xl mx-auto">
-            Browse all laptops and accessories — use filters to narrow your search.
+            Browse all laptops and accessories — search by ID or name, then filter results.
           </p>
         </div>
       </section>
 
       <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-6 sm:py-10 w-full min-w-0">
+        <div className="relative mb-6">
+          <HiOutlineMagnifyingGlass className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-base-content/40 pointer-events-none" />
+          <input
+            type="search"
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
+            placeholder="Search by product ID or name…"
+            className="input input-bordered w-full pl-12 pr-12 rounded-2xl bg-base-100 min-h-12"
+          />
+          {searchInput && (
+            <button
+              type="button"
+              onClick={() => setSearchInput("")}
+              className="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 rounded-lg hover:bg-base-200 text-base-content/50"
+              aria-label="Clear search"
+            >
+              <HiOutlineXMark className="w-5 h-5" />
+            </button>
+          )}
+        </div>
+
         <div className="flex flex-wrap gap-2 sm:gap-3 mb-6">
           {SHOP_SECTIONS.map((tab) => (
             <button
@@ -70,6 +98,7 @@ export default function ProductsPage() {
             category={section.category}
             subCategory={section.subCategory}
             filters={filters}
+            search={searchQuery}
           />
         </div>
       </div>
