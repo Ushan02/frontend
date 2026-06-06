@@ -12,7 +12,7 @@ import {
   HiOutlineBolt,
 } from "react-icons/hi2";
 import { useCart } from "../src/context/CartContext";
-import { getCategoryLabel } from "../src/lib/productCategories";
+import { getCategoryLabel, getSubCategoryLabel } from "../src/lib/productCategories";
 import { formatPrice } from "../src/lib/formatPrice";
 
 const API = import.meta.env.VITE_BACKEND_URL + "/api/products";
@@ -168,8 +168,11 @@ export default function ProductDetailPage() {
           <div className="flex flex-col">
             <div className="flex flex-wrap items-center gap-2 mb-3">
               <span className="badge badge-primary badge-outline text-xs">
-                {getCategoryLabel(product.category)}
+                {getSubCategoryLabel(product.subCategory) || getCategoryLabel(product.category)}
               </span>
+              {product.brand && (
+                <span className="badge badge-outline text-xs uppercase">{product.brand}</span>
+              )}
               <span className="badge badge-outline font-mono text-xs">
                 {product.productId}
               </span>
@@ -199,6 +202,53 @@ export default function ProductDetailPage() {
                 {formatPrice(product.price)}
               </span>
             </div>
+
+            {product.category === "laptop" && product.specs && (
+              <>
+                <div className="divider my-4 sm:my-6" />
+                <h2 className="text-sm font-semibold uppercase tracking-wide text-base-content/50 mb-3">
+                  Specifications
+                </h2>
+                <dl className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2 text-sm">
+                  {product.specs.processorBrand && (
+                    <>
+                      <dt className="text-base-content/50">Processor</dt>
+                      <dd>
+                        {product.specs.processorBrand} {product.specs.processorModel}
+                      </dd>
+                    </>
+                  )}
+                  {product.specs.ram && (
+                    <>
+                      <dt className="text-base-content/50">RAM</dt>
+                      <dd>{product.specs.ram} GB</dd>
+                    </>
+                  )}
+                  {product.specs.storageType && (
+                    <>
+                      <dt className="text-base-content/50">Storage</dt>
+                      <dd>
+                        {product.specs.storageSize} GB {product.specs.storageType}
+                      </dd>
+                    </>
+                  )}
+                  {product.specs.displaySize && (
+                    <>
+                      <dt className="text-base-content/50">Display</dt>
+                      <dd>{product.specs.displaySize}&quot;</dd>
+                    </>
+                  )}
+                  {product.specs.gpuModel && (
+                    <>
+                      <dt className="text-base-content/50">Graphics</dt>
+                      <dd>
+                        {product.specs.gpuBrand} {product.specs.gpuModel}
+                      </dd>
+                    </>
+                  )}
+                </dl>
+              </>
+            )}
 
             <div className="divider my-4 sm:my-6" />
 

@@ -8,7 +8,7 @@ import {
   getStorageHint,
   uniqueImagePath,
 } from "../../src/lib/supabase";
-import { PRODUCT_CATEGORIES } from "../../src/lib/productCategories";
+import AdminProductFields, { buildSpecsPayload, getInitialSpecs } from "../../components/AdminProductFields";
 
 const API = import.meta.env.VITE_BACKEND_URL + "/api/products";
 const BUCKET = import.meta.env.VITE_SUPABASE_BUCKET || "images";
@@ -29,8 +29,11 @@ export default function EditProduct() {
     labeledPrice: "",
     price: "",
     stock: "",
-    category: "accessories",
+    category: "laptop",
+    subCategory: "gaming",
+    brand: "",
     isAvailable: true,
+    ...getInitialSpecs(),
   });
   const [existingImages, setExistingImages] = useState([]);
   const [newImageItems, setNewImageItems] = useState([]);
@@ -47,6 +50,7 @@ export default function EditProduct() {
           headers: getAuthHeaders(),
         });
         const p = res.data;
+        const specs = p.specs || {};
         setForm({
           productName: p.productName ?? "",
           altNames: Array.isArray(p.altNames) ? p.altNames.join(", ") : "",
@@ -54,8 +58,18 @@ export default function EditProduct() {
           labeledPrice: String(p.labeledPrice ?? ""),
           price: String(p.price ?? ""),
           stock: String(p.stock ?? 0),
-          category: p.category || "accessories",
+          category: p.category || "laptop",
+          subCategory: p.subCategory || "gaming",
+          brand: p.brand || "",
           isAvailable: Boolean(p.isAvailable),
+          processorBrand: specs.processorBrand || "",
+          processorModel: specs.processorModel || "",
+          ram: specs.ram ?? "",
+          storageType: specs.storageType || "",
+          storageSize: specs.storageSize ?? "",
+          displaySize: specs.displaySize ?? "",
+          gpuBrand: specs.gpuBrand || "",
+          gpuModel: specs.gpuModel || "",
         });
         setExistingImages(Array.isArray(p.images) ? [...p.images] : []);
       } catch (err) {
@@ -68,6 +82,11 @@ export default function EditProduct() {
   }, [productId]);
 
   const update = (field, value) => {
+    setForm((prev) => ({ ...prev, [field]: value }));
+    setError("");
+  };
+
+  const updateSpec = (field, value) => {
     setForm((prev) => ({ ...prev, [field]: value }));
     setError("");
   };
@@ -152,6 +171,10 @@ export default function EditProduct() {
 
       const payload = {
         productName: productName.trim(),
+        category: form.category,
+        subCategory: form.subCategory,
+        brand: form.brand.trim(),
+        specs: buildSpecsPayload(form, form.subCategory),
         altNames: form.altNames
           .split(",")
           .map((s) => s.trim())
@@ -161,7 +184,6 @@ export default function EditProduct() {
         labeledPrice: Number(labeledPrice),
         price: Number(price),
         stock: Number(form.stock),
-        category: form.category,
         isAvailable: form.isAvailable,
       };
 
@@ -250,21 +272,7 @@ export default function EditProduct() {
             />
           </label>
 
-          <label className="form-control w-full">
-            <span className="label-text text-slate-600 font-medium">Category *</span>
-            <select
-              value={form.category}
-              onChange={(e) => update("category", e.target.value)}
-              className="select select-bordered w-full mt-1"
-              required
-            >
-              {PRODUCT_CATEGORIES.map((item) => (
-                <option key={item.value} value={item.value}>
-                  {item.label}
-                </option>
-              ))}
-            </select>
-          </label>
+          <AdminProductFields form={form} update={update} updateSpec={updateSpec} />
 
           <label className="form-control w-full">
             <span className="label-text text-slate-600 font-medium">Alt Names</span>

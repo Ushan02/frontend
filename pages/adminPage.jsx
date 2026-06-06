@@ -75,7 +75,7 @@ export default function AdminPage() {
 
   const sidebarContent = (
     <>
-      <div className="px-5 py-5 border-b border-slate-700">
+      <div className="px-5 py-5 border-b border-slate-700 shrink-0">
         <h2 className="text-lg font-bold tracking-wide flex items-center gap-2">
           <HiOutlineSquares2X2 className="w-5 h-5 shrink-0" />
           Admin Panel
@@ -87,13 +87,13 @@ export default function AdminPage() {
         )}
       </div>
 
-      <nav className="flex flex-col gap-1 p-4 flex-1">
+      <nav className="flex flex-col gap-1 p-4 flex-1 overflow-y-auto min-h-0">
         {navItems.map((item) => (
           <SidebarLink key={item.to} {...item} onNavigate={closeSidebar} />
         ))}
       </nav>
 
-      <div className="p-4 border-t border-slate-700">
+      <div className="p-4 border-t border-slate-700 shrink-0">
         <NavLink
           to="/"
           onClick={closeSidebar}
@@ -107,20 +107,8 @@ export default function AdminPage() {
   );
 
   return (
-    <div className="flex flex-col lg:flex-row min-h-[calc(100dvh-4rem)] bg-base-200 min-w-0">
-      <div className="lg:hidden sticky top-16 z-30 flex items-center justify-between gap-3 px-4 py-3 bg-slate-900 text-white border-b border-slate-700">
-        <button
-          type="button"
-          onClick={() => setSidebarOpen(true)}
-          className="p-2 rounded-lg hover:bg-slate-800 transition"
-          aria-label="Open admin menu"
-        >
-          <HiOutlineBars3 className="w-6 h-6" />
-        </button>
-        <span className="font-semibold text-sm truncate">Admin Panel</span>
-        <div className="w-10" aria-hidden />
-      </div>
-
+    <div className="flex h-[calc(100dvh-4rem)] min-w-0 bg-base-200 overflow-hidden">
+      {/* Mobile overlay */}
       {sidebarOpen && (
         <button
           type="button"
@@ -130,13 +118,13 @@ export default function AdminPage() {
         />
       )}
 
+      {/* Sidebar — fixed below header on all screen sizes */}
       <aside
-        className={`fixed top-16 left-0 z-50 h-[calc(100dvh-4rem)] w-64 max-w-[85vw] bg-slate-900 text-white flex flex-col overflow-y-auto transition-transform duration-300 ease-out lg:static lg:translate-x-0 lg:shrink-0 lg:max-w-none lg:pointer-events-auto ${
-          sidebarOpen ? "translate-x-0 pointer-events-auto" : "-translate-x-full pointer-events-none"
+        className={`fixed top-16 left-0 z-50 flex h-[calc(100dvh-4rem)] w-64 max-w-[85vw] flex-col bg-slate-900 text-white shadow-xl transition-transform duration-300 ease-out lg:max-w-none ${
+          sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
         }`}
-        aria-hidden={!sidebarOpen}
       >
-        <div className="lg:hidden flex justify-end p-3 border-b border-slate-700">
+        <div className="lg:hidden flex justify-end p-3 border-b border-slate-700 shrink-0">
           <button
             type="button"
             onClick={closeSidebar}
@@ -149,18 +137,34 @@ export default function AdminPage() {
         {sidebarContent}
       </aside>
 
-      <main className="flex-1 min-w-0 min-h-0 overflow-x-hidden">
-        <Routes>
-          <Route index element={<AdminDashboard />} />
-          <Route path="products" element={<AdminProduct />} />
-          <Route path="products/add" element={<AddProduct />} />
-          <Route path="products/edit/:productId" element={<EditProduct />} />
-          <Route path="users" element={<AdminUsers />} />
-          <Route path="orders" element={<AdminOrders />} />
-          <Route path="reviews" element={<AdminReviews />} />
-          <Route path="*" element={<Navigate to="/admin" replace />} />
-        </Routes>
-      </main>
+      {/* Main column — only this area scrolls */}
+      <div className="flex flex-1 flex-col min-w-0 min-h-0 lg:pl-64">
+        <div className="lg:hidden shrink-0 flex items-center justify-between gap-3 px-4 py-3 bg-slate-900 text-white border-b border-slate-700">
+          <button
+            type="button"
+            onClick={() => setSidebarOpen(true)}
+            className="p-2 rounded-lg hover:bg-slate-800 transition"
+            aria-label="Open admin menu"
+          >
+            <HiOutlineBars3 className="w-6 h-6" />
+          </button>
+          <span className="font-semibold text-sm truncate">Admin Panel</span>
+          <div className="w-10" aria-hidden />
+        </div>
+
+        <main className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden">
+          <Routes>
+            <Route index element={<AdminDashboard />} />
+            <Route path="products" element={<AdminProduct />} />
+            <Route path="products/add" element={<AddProduct />} />
+            <Route path="products/edit/:productId" element={<EditProduct />} />
+            <Route path="users" element={<AdminUsers />} />
+            <Route path="orders" element={<AdminOrders />} />
+            <Route path="reviews" element={<AdminReviews />} />
+            <Route path="*" element={<Navigate to="/admin" replace />} />
+          </Routes>
+        </main>
+      </div>
     </div>
   );
 }

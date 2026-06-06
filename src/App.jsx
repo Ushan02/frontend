@@ -66,7 +66,9 @@ function App() {
             path="/admin/*"
             element={
               <AdminRoute>
-                <AdminPage />
+                <div className="h-[calc(100dvh-4rem)] min-h-0 flex flex-col overflow-hidden">
+                  <AdminPage />
+                </div>
               </AdminRoute>
             }
           />

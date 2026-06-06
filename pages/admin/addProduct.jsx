@@ -8,7 +8,7 @@ import {
   getStorageHint,
   uniqueImagePath,
 } from "../../src/lib/supabase";
-import { PRODUCT_CATEGORIES } from "../../src/lib/productCategories";
+import AdminProductFields, { buildSpecsPayload, getInitialSpecs } from "../../components/AdminProductFields";
 
 const API = import.meta.env.VITE_BACKEND_URL + "/api/products";
 const BUCKET = import.meta.env.VITE_SUPABASE_BUCKET || "images";
@@ -26,8 +26,11 @@ const initialForm = {
   labeledPrice: "",
   price: "",
   stock: "",
-  category: "accessories",
+  category: "laptop",
+  subCategory: "gaming",
+  brand: "",
   isAvailable: true,
+  ...getInitialSpecs(),
 };
 
 export default function AddProduct() {
@@ -42,6 +45,11 @@ export default function AddProduct() {
   };
 
   const update = (field, value) => {
+    setForm((prev) => ({ ...prev, [field]: value }));
+    setError("");
+  };
+
+  const updateSpec = (field, value) => {
     setForm((prev) => ({ ...prev, [field]: value }));
     setError("");
   };
@@ -111,6 +119,10 @@ export default function AddProduct() {
       setError("Stock is required and must be 0 or greater.");
       return;
     }
+    if (!form.brand.trim()) {
+      setError("Brand is required.");
+      return;
+    }
     if (imageItems.length === 0) {
       setError("Please upload at least one product image.");
       return;
@@ -124,6 +136,10 @@ export default function AddProduct() {
       const payload = {
         productId: productId.trim(),
         productName: productName.trim(),
+        category: form.category,
+        subCategory: form.subCategory,
+        brand: form.brand.trim(),
+        specs: buildSpecsPayload(form, form.subCategory),
         altNames: form.altNames
           .split(",")
           .map((s) => s.trim())
@@ -133,7 +149,6 @@ export default function AddProduct() {
         labeledPrice: Number(labeledPrice),
         price: Number(price),
         stock: Number(form.stock),
-        category: form.category,
         isAvailable: form.isAvailable,
       };
 
@@ -203,21 +218,7 @@ export default function AddProduct() {
             </label>
           </div>
 
-          <label className="form-control w-full">
-            <span className="label-text text-slate-600 font-medium">Category *</span>
-            <select
-              value={form.category}
-              onChange={(e) => update("category", e.target.value)}
-              className="select select-bordered w-full mt-1"
-              required
-            >
-              {PRODUCT_CATEGORIES.map((item) => (
-                <option key={item.value} value={item.value}>
-                  {item.label}
-                </option>
-              ))}
-            </select>
-          </label>
+          <AdminProductFields form={form} update={update} updateSpec={updateSpec} />
 
           <label className="form-control w-full">
             <span className="label-text text-slate-600 font-medium">Alt Names</span>
