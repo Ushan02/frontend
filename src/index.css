@@ -337,3 +337,24 @@ body,
   border: 1px solid #fecaca;
   color: #b91c1c;
 }
+
+/* ─── Order bill print ─── */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+
+  #order-bill-print,
+  #order-bill-print * {
+    visibility: visible;
+  }
+
+  #order-bill-print {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    padding: 1.5rem;
+    background: #fff;
+  }
+}

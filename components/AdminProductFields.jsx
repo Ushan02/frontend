@@ -4,6 +4,7 @@ import {
   ACCESSORY_SUB_CATEGORIES,
   GAMING_SPECS,
   BUSINESS_SPECS,
+  getDefaultWarranty,
 } from "../src/lib/productCategories";
 
 const EMPTY_SPECS = {
@@ -88,6 +89,7 @@ export default function AdminProductFields({ form, update, updateSpec }) {
               const category = e.target.value;
               update("category", category);
               update("subCategory", category === "laptop" ? "gaming" : "memory");
+              update("warranty", getDefaultWarranty(category));
             }}
             className="select select-bordered w-full mt-1"
             required
@@ -128,6 +130,21 @@ export default function AdminProductFields({ form, update, updateSpec }) {
           required
         />
         <span className="text-xs text-slate-400 mt-1">Stored in uppercase. Appears in filters automatically.</span>
+      </label>
+
+      <label className="form-control w-full">
+        <span className="label-text text-slate-600 font-medium">Warranty *</span>
+        <input
+          type="text"
+          value={form.warranty ?? ""}
+          onChange={(e) => update("warranty", e.target.value)}
+          placeholder={isLaptop ? "1 Year" : "6 months"}
+          className="input input-bordered w-full mt-1"
+          required
+        />
+        <span className="text-xs text-slate-400 mt-1">
+          Default: laptops {getDefaultWarranty("laptop")}, accessories {getDefaultWarranty("accessories")}
+        </span>
       </label>
 
       {isLaptop && specConfig && (

@@ -9,6 +9,8 @@ import {
   uniqueImagePath,
 } from "../../src/lib/supabase";
 import AdminProductFields, { buildSpecsPayload, getInitialSpecs } from "../../components/AdminProductFields";
+import { getDefaultWarranty } from "../../src/lib/productCategories";
+import { parseStock, sanitizeStockInput } from "../../src/lib/stock";
 
 const API = import.meta.env.VITE_BACKEND_URL + "/api/products";
 const BUCKET = import.meta.env.VITE_SUPABASE_BUCKET || "images";
@@ -32,6 +34,7 @@ export default function EditProduct() {
     category: "laptop",
     subCategory: "gaming",
     brand: "",
+    warranty: getDefaultWarranty("laptop"),
     isAvailable: true,
     ...getInitialSpecs(),
   });
@@ -57,10 +60,11 @@ export default function EditProduct() {
           descriptions: p.descriptions ?? "",
           labeledPrice: String(p.labeledPrice ?? ""),
           price: String(p.price ?? ""),
-          stock: String(p.stock ?? 0),
+          stock: sanitizeStockInput(String(p.stock ?? 0)),
           category: p.category || "laptop",
           subCategory: p.subCategory || "gaming",
           brand: p.brand || "",
+          warranty: p.warranty || getDefaultWarranty(p.category || "laptop"),
           isAvailable: Boolean(p.isAvailable),
           processorBrand: specs.processorBrand || "",
           processorModel: specs.processorModel || "",
@@ -152,8 +156,9 @@ export default function EditProduct() {
       setError("Labeled price and price are required.");
       return;
     }
-    if (form.stock === "" || Number(form.stock) < 0) {
-      setError("Stock is required and must be 0 or greater.");
+    const stock = parseStock(form.stock);
+    if (stock === null) {
+      setError("Stock must be a whole number (0 or greater).");
       return;
     }
 
@@ -183,7 +188,8 @@ export default function EditProduct() {
         images,
         labeledPrice: Number(labeledPrice),
         price: Number(price),
-        stock: Number(form.stock),
+        stock,
+        warranty: form.warranty.trim() || getDefaultWarranty(form.category),
         isAvailable: form.isAvailable,
       };
 
@@ -326,11 +332,11 @@ export default function EditProduct() {
           <label className="form-control w-full">
             <span className="label-text text-slate-600 font-medium">Stock *</span>
             <input
-              type="number"
-              min="0"
-              step="1"
+              type="text"
+              inputMode="numeric"
+              pattern="[0-9]*"
               value={form.stock}
-              onChange={(e) => update("stock", e.target.value)}
+              onChange={(e) => update("stock", sanitizeStockInput(e.target.value))}
               className="input input-bordered w-full mt-1"
               required
             />

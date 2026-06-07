@@ -146,7 +146,7 @@ export default function CartPage() {
             <p className="text-xs text-base-content/50">Shipping and taxes calculated at checkout.</p>
             <div className="flex flex-col sm:flex-row gap-2 mt-4">
               <Link to="/checkout" className="btn btn-primary flex-1">
-                Proceed to checkout
+                Create order
               </Link>
               <Link to="/products" className="btn btn-outline flex-1">
                 Continue shopping

@@ -1,6 +1,8 @@
-import { Fragment, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
-import { HiOutlineChevronDown, HiOutlineChevronUp } from "react-icons/hi2";
+import { HiOutlinePlus } from "react-icons/hi2";
+import AdminAddOrderModal from "../../components/AdminAddOrderModal";
+import OrderDetailModal from "../../components/OrderDetailModal";
 import { API_BASE, getAuthHeaders } from "../../src/lib/adminApi";
 import { formatPrice } from "../../src/lib/formatPrice";
 
@@ -11,14 +13,18 @@ const STATUSES = ["pending", "processing", "shipped", "delivered", "cancelled"];
 function PaymentBadge({ method, paymentStatus }) {
   const labels = {
     pending_cod: "COD — pending",
+    pending_pos: "POS card — pending",
     awaiting_payment: "Awaiting payment",
-    paid: "Paid online",
+    paid: "Payment successful",
+    partial_paid: "Card paid — cash pending",
     failed: "Payment failed",
     cancelled: "Cancelled",
   };
   const colors = {
     pending_cod: "bg-amber-100 text-amber-800",
+    pending_pos: "bg-orange-100 text-orange-800",
     awaiting_payment: "bg-orange-100 text-orange-800",
+    partial_paid: "bg-sky-100 text-sky-800",
     paid: "bg-emerald-100 text-emerald-800",
     failed: "bg-red-100 text-red-800",
     cancelled: "bg-slate-100 text-slate-700",
@@ -41,14 +47,15 @@ function StatusBadge({ status }) {
   };
   return (
     <span className={`px-2.5 py-1 rounded-full text-xs font-medium capitalize ${colors[status] || "bg-slate-100"}`}>
-      {status}
+      {status === "delivered" ? "Done" : status}
     </span>
   );
 }
 
 export default function AdminOrders() {
   const [orders, setOrders] = useState([]);
-  const [expanded, setExpanded] = useState(null);
+  const [selectedOrder, setSelectedOrder] = useState(null);
+  const [addOrderOpen, setAddOrderOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -69,6 +76,11 @@ export default function AdminOrders() {
     fetchOrders();
   }, []);
 
+  const handleOrderUpdated = (updated) => {
+    setOrders((prev) => prev.map((o) => (o.orderId === updated.orderId ? updated : o)));
+    setSelectedOrder(updated);
+  };
+
   const updateStatus = async (orderId, status) => {
     try {
       const res = await axios.patch(
@@ -76,9 +88,11 @@ export default function AdminOrders() {
         { status },
         { headers: getAuthHeaders() }
       );
-      setOrders((prev) =>
-        prev.map((o) => (o.orderId === orderId ? res.data.order : o))
-      );
+      const updated = res.data.order;
+      setOrders((prev) => prev.map((o) => (o.orderId === orderId ? updated : o)));
+      if (selectedOrder?.orderId === orderId) {
+        setSelectedOrder(updated);
+      }
     } catch (err) {
       alert(err.response?.data?.message || "Failed to update status.");
     }
@@ -91,9 +105,19 @@ export default function AdminOrders() {
 
   return (
     <div className="p-4 sm:p-6 lg:p-8 min-w-0">
-      <div className="mb-6">
-        <h1 className="text-xl sm:text-2xl font-bold text-slate-800">Orders</h1>
-        <p className="text-slate-500 text-sm mt-1">View and update customer orders</p>
+      <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <h1 className="text-xl sm:text-2xl font-bold text-slate-800">Orders</h1>
+          <p className="text-slate-500 text-sm mt-1">Click a row to view details, or add a new in-store order</p>
+        </div>
+        <button
+          type="button"
+          onClick={() => setAddOrderOpen(true)}
+          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-[#0077b6] hover:bg-[#03045e] text-white text-sm font-semibold"
+        >
+          <HiOutlinePlus className="w-5 h-5" />
+          Add Order
+        </button>
       </div>
 
       {error && (
@@ -112,7 +136,6 @@ export default function AdminOrders() {
           <table className="w-full text-left min-w-[900px]">
             <thead className="bg-slate-50 text-slate-600 border-b border-slate-200">
               <tr>
-                <th className="px-5 py-3.5 text-xs font-semibold uppercase w-8" />
                 <th className="px-5 py-3.5 text-xs font-semibold uppercase">Order ID</th>
                 <th className="px-5 py-3.5 text-xs font-semibold uppercase">Customer</th>
                 <th className="px-5 py-3.5 text-xs font-semibold uppercase">Total</th>
@@ -124,84 +147,44 @@ export default function AdminOrders() {
             </thead>
             <tbody className="divide-y divide-slate-100">
               {orders.map((order) => (
-                <Fragment key={order.orderId}>
-                  <tr className="hover:bg-slate-50">
-                    <td className="px-5 py-3.5">
-                      <button
-                        type="button"
-                        onClick={() =>
-                          setExpanded(expanded === order.orderId ? null : order.orderId)
-                        }
-                        className="btn btn-ghost btn-xs btn-square"
-                      >
-                        {expanded === order.orderId ? (
-                          <HiOutlineChevronUp className="w-4 h-4" />
-                        ) : (
-                          <HiOutlineChevronDown className="w-4 h-4" />
-                        )}
-                      </button>
-                    </td>
-                    <td className="px-5 py-3.5 text-sm font-mono text-slate-600">
-                      {order.orderId}
-                    </td>
-                    <td className="px-5 py-3.5">
-                      <p className="text-sm font-medium text-slate-800">{order.name}</p>
-                      <p className="text-xs text-slate-500">{order.email}</p>
-                    </td>
-                    <td className="px-5 py-3.5 text-sm font-bold text-slate-800">
-                      {formatPrice(order.total)}
-                    </td>
-                    <td className="px-5 py-3.5">
-                      <PaymentBadge method={order.paymentMethod} paymentStatus={order.paymentStatus} />
-                    </td>
-                    <td className="px-5 py-3.5">
-                      <StatusBadge status={order.status} />
-                    </td>
-                    <td className="px-5 py-3.5 text-sm text-slate-500">
-                      {formatDate(order.date)}
-                    </td>
-                    <td className="px-5 py-3.5">
-                      <select
-                        value={order.status}
-                        onChange={(e) => updateStatus(order.orderId, e.target.value)}
-                        className="select select-bordered select-sm"
-                      >
-                        {STATUSES.map((s) => (
-                          <option key={s} value={s}>
-                            {s}
-                          </option>
-                        ))}
-                      </select>
-                    </td>
-                  </tr>
-                  {expanded === order.orderId && (
-                    <tr>
-                      <td colSpan={8} className="px-5 py-4 bg-slate-50">
-                        <div className="grid sm:grid-cols-2 gap-4 text-sm">
-                          <div>
-                            <p className="font-medium text-slate-700 mb-1">Delivery</p>
-                            <p className="text-slate-600">Phone: {order.phone}</p>
-                            <p className="text-slate-600">{order.address}</p>
-                            <p className="text-slate-600 mt-2 capitalize">
-                              Payment: {order.paymentMethod || "cod"} — {order.paymentStatus || "pending_cod"}
-                            </p>
-                          </div>
-                          <div>
-                            <p className="font-medium text-slate-700 mb-2">Items</p>
-                            <ul className="space-y-1">
-                              {order.products?.map((line, i) => (
-                                <li key={i} className="text-slate-600">
-                                  {line.productinfo?.productName} × {line.quantity} —{" "}
-                                  {formatPrice(line.productinfo?.price * line.quantity)}
-                                </li>
-                              ))}
-                            </ul>
-                          </div>
-                        </div>
-                      </td>
-                    </tr>
-                  )}
-                </Fragment>
+                <tr
+                  key={order.orderId}
+                  onClick={() => setSelectedOrder(order)}
+                  className="hover:bg-slate-50 cursor-pointer transition-colors"
+                >
+                  <td className="px-5 py-3.5 text-sm font-mono text-slate-600">
+                    {order.orderId}
+                  </td>
+                  <td className="px-5 py-3.5">
+                    <p className="text-sm font-medium text-slate-800">{order.name}</p>
+                    <p className="text-xs text-slate-500">{order.email}</p>
+                  </td>
+                  <td className="px-5 py-3.5 text-sm font-bold text-slate-800">
+                    {formatPrice(order.total)}
+                  </td>
+                  <td className="px-5 py-3.5">
+                    <PaymentBadge method={order.paymentMethod} paymentStatus={order.paymentStatus} />
+                  </td>
+                  <td className="px-5 py-3.5">
+                    <StatusBadge status={order.status} />
+                  </td>
+                  <td className="px-5 py-3.5 text-sm text-slate-500">
+                    {formatDate(order.date)}
+                  </td>
+                  <td className="px-5 py-3.5" onClick={(e) => e.stopPropagation()}>
+                    <select
+                      value={order.status}
+                      onChange={(e) => updateStatus(order.orderId, e.target.value)}
+                      className="select select-bordered select-sm"
+                    >
+                      {STATUSES.map((s) => (
+                        <option key={s} value={s}>
+                          {s === "delivered" ? "Done" : s}
+                        </option>
+                      ))}
+                    </select>
+                  </td>
+                </tr>
               ))}
             </tbody>
           </table>
@@ -211,6 +194,21 @@ export default function AdminOrders() {
       {!loading && orders.length > 0 && (
         <p className="text-sm text-slate-400 mt-4">{orders.length} orders</p>
       )}
+
+      <OrderDetailModal
+        order={selectedOrder}
+        onClose={() => setSelectedOrder(null)}
+        onOrderUpdated={handleOrderUpdated}
+      />
+
+      <AdminAddOrderModal
+        open={addOrderOpen}
+        onClose={() => setAddOrderOpen(false)}
+        onSuccess={(order) => {
+          setOrders((prev) => [order, ...prev]);
+          setSelectedOrder(order);
+        }}
+      />
     </div>
   );
 }

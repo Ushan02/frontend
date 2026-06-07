@@ -7,12 +7,13 @@ import {
   HiOutlineEye,
   HiOutlineChevronLeft,
   HiOutlineChevronRight,
+  HiOutlineShieldCheck,
 } from "react-icons/hi2";
 import DiscountBadge from "./DiscountBadge";
 import { useCart } from "../src/context/CartContext";
 import { formatPrice } from "../src/lib/formatPrice";
 import { getDiscountPercent } from "../src/lib/discount";
-import { getSubCategoryLabel } from "../src/lib/productCategories";
+import { getSubCategoryLabel, getDefaultWarranty } from "../src/lib/productCategories";
 
 const API = import.meta.env.VITE_BACKEND_URL + "/api/products";
 const PAGE_SIZE = 9;
@@ -45,6 +46,7 @@ export function ProductCard({ product, variant, compact = false }) {
   const discount = getDiscountPercent(product.labeledPrice, product.price);
   const onSale = discount > 0;
   const specs = product.specs || {};
+  const warranty = product.warranty || getDefaultWarranty(product.category);
 
   const handleQuickAdd = (e) => {
     e.preventDefault();
@@ -156,6 +158,13 @@ export function ProductCard({ product, variant, compact = false }) {
           <p className="text-[11px] text-base-content/60 line-clamp-1">
             {specs.processorModel}
             {specs.ram ? ` · ${specs.ram}GB RAM` : ""}
+          </p>
+        )}
+
+        {!compact && (
+          <p className="text-[10px] text-base-content/55 flex items-center gap-1">
+            <HiOutlineShieldCheck className="w-3.5 h-3.5 text-primary shrink-0" />
+            Warranty: {warranty}
           </p>
         )}
 

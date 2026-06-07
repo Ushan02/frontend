@@ -1,3 +1,10 @@
+export const LAPTOP_WARRANTY = "1 Year";
+export const ACCESSORY_WARRANTY = "6 months";
+
+export function getDefaultWarranty(category) {
+  return category === "laptop" ? LAPTOP_WARRANTY : ACCESSORY_WARRANTY;
+}
+
 export const PRODUCT_CATEGORIES = [
   { value: "laptop", label: "Laptops" },
   { value: "accessories", label: "Accessories" },

@@ -10,9 +10,10 @@ import {
   HiOutlinePlus,
   HiOutlineCheck,
   HiOutlineBolt,
+  HiOutlineShieldCheck,
 } from "react-icons/hi2";
 import { useCart } from "../src/context/CartContext";
-import { getCategoryLabel, getSubCategoryLabel } from "../src/lib/productCategories";
+import { getCategoryLabel, getSubCategoryLabel, getDefaultWarranty } from "../src/lib/productCategories";
 import { formatPrice } from "../src/lib/formatPrice";
 import ProductReviews from "../components/ProductReviews";
 import DiscountBadge from "../components/DiscountBadge";
@@ -76,6 +77,7 @@ export default function ProductDetailPage() {
   const canBuy = product.isAvailable && !outOfStock;
   const discount = getDiscountPercent(product.labeledPrice, product.price);
   const onSale = discount > 0;
+  const warranty = product.warranty || getDefaultWarranty(product.category);
 
   const handleAddToCart = () => {
     if (outOfStock) {
@@ -203,7 +205,7 @@ export default function ProductDetailPage() {
               </div>
             )}
 
-            <div className="flex items-end gap-2 sm:gap-3 mt-3 flex-wrap">
+            <div className="flex items-end gap-2 sm:gap-3 mt-4 sm:mt-6 flex-wrap">
               <span className="text-3xl sm:text-4xl font-extrabold text-primary">
                 {formatPrice(product.price)}
               </span>
@@ -214,61 +216,20 @@ export default function ProductDetailPage() {
               )}
             </div>
 
-            {product.category === "laptop" && product.specs && (
-              <>
-                <div className="divider my-4 sm:my-6" />
-                <h2 className="text-sm font-semibold uppercase tracking-wide text-base-content/50 mb-3">
-                  Specifications
-                </h2>
-                <dl className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2 text-sm">
-                  {product.specs.processorBrand && (
-                    <>
-                      <dt className="text-base-content/50">Processor</dt>
-                      <dd>
-                        {product.specs.processorBrand} {product.specs.processorModel}
-                      </dd>
-                    </>
-                  )}
-                  {product.specs.ram && (
-                    <>
-                      <dt className="text-base-content/50">RAM</dt>
-                      <dd>{product.specs.ram} GB</dd>
-                    </>
-                  )}
-                  {product.specs.storageType && (
-                    <>
-                      <dt className="text-base-content/50">Storage</dt>
-                      <dd>
-                        {product.specs.storageSize} GB {product.specs.storageType}
-                      </dd>
-                    </>
-                  )}
-                  {product.specs.displaySize && (
-                    <>
-                      <dt className="text-base-content/50">Display</dt>
-                      <dd>{product.specs.displaySize}&quot;</dd>
-                    </>
-                  )}
-                  {product.specs.gpuModel && (
-                    <>
-                      <dt className="text-base-content/50">Graphics</dt>
-                      <dd>
-                        {product.specs.gpuBrand} {product.specs.gpuModel}
-                      </dd>
-                    </>
-                  )}
-                </dl>
-              </>
-            )}
-
-            <div className="divider my-4 sm:my-6" />
-
-            <h2 className="text-sm font-semibold uppercase tracking-wide text-base-content/50 mb-2">
-              Description
-            </h2>
-            <p className="text-base-content/80 leading-relaxed whitespace-pre-wrap">
-              {product.descriptions}
-            </p>
+            <div className="mt-6">
+              <h2 className="text-sm font-semibold uppercase tracking-wide text-base-content/50 mb-2">
+                Description
+              </h2>
+              <p className="text-base-content/80 leading-relaxed whitespace-pre-wrap">
+                {product.descriptions}
+              </p>
+              <p className="mt-4 inline-flex items-center gap-2 text-sm text-base-content/70">
+                <HiOutlineShieldCheck className="w-5 h-5 text-primary shrink-0" />
+                <span>
+                  Warranty: <strong className="text-primary">{warranty}</strong>
+                </span>
+              </p>
+            </div>
 
             {canBuy && (
               <div className="flex items-center gap-3 mt-6">
@@ -336,13 +297,6 @@ export default function ProductDetailPage() {
               </button>
             </div>
 
-            <p className={`text-xs mt-4 ${outOfStock ? "text-red-600 font-medium" : "text-base-content/40"}`}>
-              {outOfStock
-                ? "Out of stock"
-                : product.isAvailable
-                  ? "✓ In stock and ready to ship"
-                  : "Currently unavailable"}
-            </p>
           </div>
         </div>
 
