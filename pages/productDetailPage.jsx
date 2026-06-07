@@ -323,7 +323,7 @@ export default function ProductDetailPage() {
                 className="btn btn-primary btn-md sm:btn-lg flex-1 gap-2 min-h-12"
               >
                 <HiOutlineShoppingCart className="w-5 h-5 shrink-0" />
-                Add to Cart
+                ADD TO CART
               </button>
               <button
                 type="button"

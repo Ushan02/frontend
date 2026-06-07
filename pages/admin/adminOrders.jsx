@@ -8,6 +8,29 @@ const API = API_BASE + "/api/order";
 
 const STATUSES = ["pending", "processing", "shipped", "delivered", "cancelled"];
 
+function PaymentBadge({ method, paymentStatus }) {
+  const labels = {
+    pending_cod: "COD — pending",
+    awaiting_payment: "Awaiting payment",
+    paid: "Paid online",
+    failed: "Payment failed",
+    cancelled: "Cancelled",
+  };
+  const colors = {
+    pending_cod: "bg-amber-100 text-amber-800",
+    awaiting_payment: "bg-orange-100 text-orange-800",
+    paid: "bg-emerald-100 text-emerald-800",
+    failed: "bg-red-100 text-red-800",
+    cancelled: "bg-slate-100 text-slate-700",
+  };
+  const key = paymentStatus || (method === "cod" ? "pending_cod" : "awaiting_payment");
+  return (
+    <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${colors[key] || "bg-slate-100"}`}>
+      {labels[key] || key}
+    </span>
+  );
+}
+
 function StatusBadge({ status }) {
   const colors = {
     pending: "bg-amber-100 text-amber-800",
@@ -93,6 +116,7 @@ export default function AdminOrders() {
                 <th className="px-5 py-3.5 text-xs font-semibold uppercase">Order ID</th>
                 <th className="px-5 py-3.5 text-xs font-semibold uppercase">Customer</th>
                 <th className="px-5 py-3.5 text-xs font-semibold uppercase">Total</th>
+                <th className="px-5 py-3.5 text-xs font-semibold uppercase">Payment</th>
                 <th className="px-5 py-3.5 text-xs font-semibold uppercase">Status</th>
                 <th className="px-5 py-3.5 text-xs font-semibold uppercase">Date</th>
                 <th className="px-5 py-3.5 text-xs font-semibold uppercase">Update</th>
@@ -128,6 +152,9 @@ export default function AdminOrders() {
                       {formatPrice(order.total)}
                     </td>
                     <td className="px-5 py-3.5">
+                      <PaymentBadge method={order.paymentMethod} paymentStatus={order.paymentStatus} />
+                    </td>
+                    <td className="px-5 py-3.5">
                       <StatusBadge status={order.status} />
                     </td>
                     <td className="px-5 py-3.5 text-sm text-slate-500">
@@ -149,12 +176,15 @@ export default function AdminOrders() {
                   </tr>
                   {expanded === order.orderId && (
                     <tr>
-                      <td colSpan={7} className="px-5 py-4 bg-slate-50">
+                      <td colSpan={8} className="px-5 py-4 bg-slate-50">
                         <div className="grid sm:grid-cols-2 gap-4 text-sm">
                           <div>
                             <p className="font-medium text-slate-700 mb-1">Delivery</p>
                             <p className="text-slate-600">Phone: {order.phone}</p>
                             <p className="text-slate-600">{order.address}</p>
+                            <p className="text-slate-600 mt-2 capitalize">
+                              Payment: {order.paymentMethod || "cod"} — {order.paymentStatus || "pending_cod"}
+                            </p>
                           </div>
                           <div>
                             <p className="font-medium text-slate-700 mb-2">Items</p>

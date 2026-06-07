@@ -13,6 +13,7 @@ import ProductsPage from '../pages/productsPage'
 import ProductDetailPage from '../pages/productDetailPage'
 import CartPage from '../pages/cartPage'
 import CheckoutPage from '../pages/checkoutPage'
+import CheckoutSuccessPage from '../pages/checkoutSuccessPage'
 import AboutUsPage from '../pages/aboutUsPage'
 import { CartProvider } from './context/CartContext'
 
@@ -86,6 +87,7 @@ function App() {
             <Route path="/products/:productId" element={<ProductDetailPage />} />
             <Route path="/cart" element={<CartPage />} />
             <Route path="/checkout" element={<CheckoutPage />} />
+            <Route path="/checkout/success" element={<CheckoutSuccessPage />} />
             <Route path="/login" element={<GuestRoute><LoginPage /></GuestRoute>} />
             <Route path="/register" element={<GuestRoute><RegisterPage /></GuestRoute>} />
             <Route path="/forgot-password" element={<GuestRoute><ForgotPasswordPage /></GuestRoute>} />

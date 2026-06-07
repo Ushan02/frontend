@@ -176,7 +176,7 @@ export function ProductCard({ product, variant, compact = false }) {
           disabled={!canBuy}
           className={`btn btn-primary mt-0.5 ${compact ? "btn-xs rounded-lg min-h-7 h-7 text-xs" : "btn-xs sm:btn-sm rounded-lg min-h-8 h-8 text-xs sm:text-sm"}`}
         >
-          {outOfStock ? "Sold out" : "Add to bag"}
+          {outOfStock ? "Sold out" : "ADD TO CART"}
         </button>
       </div>
     </article>
