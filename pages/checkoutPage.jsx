@@ -324,8 +324,6 @@ export default function CheckoutPage() {
 
       }
 
-
-
       setOrderSuccess(res.data.order);
 
       clearCart();
