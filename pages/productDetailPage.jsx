@@ -188,7 +188,7 @@ export default function ProductDetailPage() {
               </span>
             </div>
 
-            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-base-content leading-tight break-words">
+            <h1 className="text-[1.625rem] sm:text-3xl md:text-4xl font-bold text-base-content leading-tight break-words">
               {product.productName}
             </h1>
 
@@ -217,10 +217,10 @@ export default function ProductDetailPage() {
             </div>
 
             <div className="mt-6">
-              <h2 className="text-sm font-semibold uppercase tracking-wide text-base-content/50 mb-2">
+              <h2 className="text-base sm:text-sm font-semibold uppercase tracking-wide text-base-content/50 mb-2">
                 Description
               </h2>
-              <p className="text-base-content/80 leading-relaxed whitespace-pre-wrap">
+              <p className="text-base sm:text-[0.9375rem] text-base-content/80 leading-relaxed whitespace-pre-wrap">
                 {product.descriptions}
               </p>
               <p className="mt-4 inline-flex items-center gap-2 text-sm text-base-content/70">

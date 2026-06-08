@@ -143,7 +143,7 @@ export default function Header() {
           >
             <HiOutlineShoppingCart className="w-6 h-6" />
             {cartCount > 0 && (
-              <span className="absolute -top-0.5 -right-0.5 min-w-[1.125rem] h-[1.125rem] px-0.5 flex items-center justify-center rounded-full bg-white text-ocean text-[10px] font-bold">
+              <span className="absolute -top-0.5 -right-0.5 min-w-[1.125rem] h-[1.125rem] px-0.5 flex items-center justify-center rounded-full bg-white text-ocean text-xs font-bold">
                 {cartCount > 99 ? "99+" : cartCount}
               </span>
             )}

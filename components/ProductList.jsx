@@ -118,58 +118,46 @@ export function ProductCard({ product, variant, compact = false }) {
       </div>
 
       <div className={`flex flex-col flex-1 ${compact ? "gap-1 pt-2 px-0.5" : "gap-1.5 px-0.5 pt-2.5"}`}>
-        <p
-          className={`font-semibold text-primary/80 uppercase tracking-widest ${
-            compact ? "text-[10px]" : "text-[10px]"
-          }`}
-        >
+        <p className="font-semibold text-primary/80 uppercase tracking-widest text-xs sm:text-[10px]">
           {product.brand}
         </p>
         <Link to={`/products/${product.productId}`}>
           <h2
-            className={`font-bold group-hover:text-primary transition-colors ${
-              compact
-                ? "text-xs sm:text-sm line-clamp-2"
-                : "text-sm sm:text-base line-clamp-2"
+            className={`font-bold group-hover:text-primary transition-colors line-clamp-2 ${
+              compact ? "text-sm sm:text-sm" : "text-base sm:text-base"
             }`}
           >
             {product.productName}
           </h2>
         </Link>
 
-        {compact ? (
-          <p className="text-[9px] text-base-content/45 uppercase tracking-wide line-clamp-1">
-            {getSubCategoryLabel(product.subCategory)}
-          </p>
-        ) : (
-          <p className="text-[10px] text-base-content/45 uppercase tracking-wide">
-            {getSubCategoryLabel(product.subCategory)}
-          </p>
-        )}
+        <p className="text-xs sm:text-[10px] text-base-content/45 uppercase tracking-wide line-clamp-1">
+          {getSubCategoryLabel(product.subCategory)}
+        </p>
 
         {showGamingSpecs && (
-          <p className="text-[11px] text-base-content/60 line-clamp-1">
+          <p className="text-xs sm:text-[11px] text-base-content/60 line-clamp-1">
             {specs.processorModel}
             {specs.gpuModel ? ` · ${specs.gpuModel}` : ""}
           </p>
         )}
 
         {showBusinessSpecs && (
-          <p className="text-[11px] text-base-content/60 line-clamp-1">
+          <p className="text-xs sm:text-[11px] text-base-content/60 line-clamp-1">
             {specs.processorModel}
             {specs.ram ? ` · ${specs.ram}GB RAM` : ""}
           </p>
         )}
 
         {!compact && (
-          <p className="text-[10px] text-base-content/55 flex items-center gap-1">
+          <p className="text-xs sm:text-[10px] text-base-content/55 flex items-center gap-1">
             <HiOutlineShieldCheck className="w-3.5 h-3.5 text-primary shrink-0" />
             Warranty: {warranty}
           </p>
         )}
 
         <div className={`flex items-baseline flex-wrap mt-auto ${compact ? "gap-1 pt-1" : "gap-1.5 pt-1.5"}`}>
-            <span className={compact ? "text-sm font-extrabold text-primary" : "text-base sm:text-lg font-extrabold text-primary"}>
+            <span className={compact ? "text-base font-extrabold text-primary" : "text-lg sm:text-lg font-extrabold text-primary"}>
               {formatPrice(product.price)}
             </span>
             {onSale && (

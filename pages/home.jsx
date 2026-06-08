@@ -235,7 +235,7 @@ export default function HomePage() {
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20 lg:py-24">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-12 items-center">
             <div>
-              <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/15 backdrop-blur-sm text-sm font-medium border border-white/20 mb-6">
+              <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/15 backdrop-blur-sm text-base sm:text-sm font-medium border border-white/20 mb-6">
                 <HiOutlineSparkles className="w-4 h-4" />
                 Sri Lanka&apos;s laptop & tech store
               </span>
@@ -296,7 +296,7 @@ export default function HomePage() {
                   className="relative w-full aspect-[4/3] object-cover mix-blend-luminosity opacity-85"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-navy/70 to-cyan/30 mix-blend-multiply" />
-                <span className="absolute bottom-2 left-2 text-[10px] font-semibold px-2 py-0.5 rounded-full bg-white/15 text-white border border-white/20">
+                <span className="absolute bottom-2 left-2 text-xs font-semibold px-2 py-0.5 rounded-full bg-white/15 text-white border border-white/20">
                   {laptop.label}
                 </span>
               </div>
@@ -325,7 +325,7 @@ export default function HomePage() {
               <h2 className="text-xl font-bold text-base-content mb-2 group-hover:text-primary transition-colors">
                 {cat.title}
               </h2>
-              <p className="text-sm text-base-content/60 leading-relaxed mb-4">
+              <p className="text-base sm:text-sm text-base-content/60 leading-relaxed mb-4">
                 {cat.desc}
               </p>
               <span className="inline-flex items-center gap-1 text-sm font-semibold text-primary">
