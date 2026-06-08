@@ -15,6 +15,7 @@ import CartPage from '../pages/cartPage'
 import CheckoutPage from '../pages/checkoutPage'
 import CheckoutSuccessPage from '../pages/checkoutSuccessPage'
 import AboutUsPage from '../pages/aboutUsPage'
+import PurchaseHistoryPage from '../pages/purchaseHistoryPage'
 import { CartProvider } from './context/CartContext'
 
 // Safely parse stored user
@@ -34,6 +35,17 @@ function AdminRoute({ children }) {
 
   if (!token || !user) return <Navigate to="/login" replace />;
   if (user.role !== "admin") return <Navigate to="/" replace />;
+  return children;
+}
+
+// Customer-only routes — redirect to login if not signed in
+function AuthRoute({ children }) {
+  const token = localStorage.getItem("token");
+  const user  = getStoredUser();
+
+  if (!token || !user) {
+    return <Navigate to="/login" replace state={{ from: "/my-orders" }} />;
+  }
   return children;
 }
 
@@ -88,6 +100,7 @@ function App() {
             <Route path="/cart" element={<CartPage />} />
             <Route path="/checkout" element={<CheckoutPage />} />
             <Route path="/checkout/success" element={<CheckoutSuccessPage />} />
+            <Route path="/my-orders" element={<AuthRoute><PurchaseHistoryPage /></AuthRoute>} />
             <Route path="/login" element={<GuestRoute><LoginPage /></GuestRoute>} />
             <Route path="/register" element={<GuestRoute><RegisterPage /></GuestRoute>} />
             <Route path="/forgot-password" element={<GuestRoute><ForgotPasswordPage /></GuestRoute>} />

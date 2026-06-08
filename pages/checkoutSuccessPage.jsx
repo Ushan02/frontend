@@ -126,12 +126,12 @@ export default function CheckoutSuccessPage() {
         </p>
       )}
 
-      <div className="flex gap-3 mt-8">
-        <Link to="/products" className="btn btn-primary">
-          Continue shopping
+      <div className="flex flex-wrap justify-center gap-3 mt-8">
+        <Link to="/my-orders" className="btn btn-primary">
+          View my orders
         </Link>
-        <Link to="/" className="btn btn-outline">
-          Home
+        <Link to="/products" className="btn btn-outline">
+          Continue shopping
         </Link>
       </div>
     </div>

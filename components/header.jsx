@@ -11,6 +11,7 @@ import {
   HiOutlineBars3,
   HiOutlineXMark,
   HiOutlineInformationCircle,
+  HiOutlineClipboardDocumentList,
 } from "react-icons/hi2";
 import { useCart } from "../src/context/CartContext";
 import Logo from "./Logo";
@@ -91,6 +92,11 @@ export default function Header() {
       </Link>
       {user ? (
         <>
+          {user.role !== "admin" && (
+            <NavLinkItem to="/my-orders" icon={HiOutlineClipboardDocumentList} onClick={closeMenu}>
+              My Orders
+            </NavLinkItem>
+          )}
           {user.role === "admin" && (
             <NavLinkItem to="/admin" icon={HiOutlineCog6Tooth} onClick={closeMenu}>
               Admin
