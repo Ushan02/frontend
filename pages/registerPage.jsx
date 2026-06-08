@@ -1,12 +1,18 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 import { GoogleLogin } from "@react-oauth/google";
 import { HiOutlineUserPlus } from "react-icons/hi2";
 import { useCart } from "../src/context/CartContext";
-import { GOOGLE_CLIENT_ID, saveSessionAndRedirect } from "../src/lib/auth";
+import {
+  API_USERS,
+  GOOGLE_CLIENT_ID,
+  formatAuthError,
+  getGoogleAuthIssues,
+  saveSessionAndRedirect,
+} from "../src/lib/auth";
 
-const API = import.meta.env.VITE_BACKEND_URL + "/api/users";
+const API = API_USERS;
 
 export default function RegisterPage() {
   const [form, setForm] = useState({
@@ -21,6 +27,13 @@ export default function RegisterPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const { reloadCart } = useCart();
+
+  useEffect(() => {
+    if (!GOOGLE_CLIENT_ID) return;
+    getGoogleAuthIssues().then((issues) => {
+      if (issues.length > 0) setError(issues.join(" "));
+    });
+  }, []);
 
   const set = (key) => (e) => setForm({ ...form, [key]: e.target.value });
 
@@ -78,7 +91,7 @@ export default function RegisterPage() {
         reloadCart,
       });
     } catch (err) {
-      setError(err.response?.data?.message || "Google sign-in failed. Please try again.");
+      setError(formatAuthError(err, "Google sign-in failed. Please try again."));
     } finally {
       setLoading(false);
     }

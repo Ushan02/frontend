@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 import { GoogleLogin } from "@react-oauth/google";
@@ -8,9 +8,15 @@ import {
   HiOutlineArrowRightOnRectangle,
 } from "react-icons/hi2";
 import { useCart } from "../src/context/CartContext";
-import { GOOGLE_CLIENT_ID, saveSessionAndRedirect } from "../src/lib/auth";
+import {
+  API_USERS,
+  GOOGLE_CLIENT_ID,
+  formatAuthError,
+  getGoogleAuthIssues,
+  saveSessionAndRedirect,
+} from "../src/lib/auth";
 
-const API = import.meta.env.VITE_BACKEND_URL + "/api/users";
+const API = API_USERS;
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -22,6 +28,13 @@ export default function LoginPage() {
   const { reloadCart } = useCart();
 
   const successMsg = location.state?.message;
+
+  useEffect(() => {
+    if (!GOOGLE_CLIENT_ID) return;
+    getGoogleAuthIssues().then((issues) => {
+      if (issues.length > 0) setError(issues.join(" "));
+    });
+  }, []);
 
   const finishAuth = (token, user) => {
     saveSessionAndRedirect({ token, user, navigate, location, reloadCart });
@@ -57,7 +70,7 @@ export default function LoginPage() {
       });
       finishAuth(res.data.token, res.data.user);
     } catch (err) {
-      setError(err.response?.data?.message || "Google sign-in failed. Please try again.");
+      setError(formatAuthError(err, "Google sign-in failed. Please try again."));
     } finally {
       setLoading(false);
     }
