@@ -343,23 +343,6 @@ export default function CheckoutPage() {
 
     try {
 
-      const profileRes = await axios.patch(
-        `${import.meta.env.VITE_BACKEND_URL}/api/users/me/customer-id`,
-        { customerId: form.customerId },
-        { headers: getAuthHeaders() }
-      );
-
-      const stored = getStoredUser();
-
-      if (stored) {
-
-        localStorage.setItem(
-          "user",
-          JSON.stringify({ ...stored, customerId: profileRes.data.customerId })
-        );
-
-      }
-
       const payload = {
 
         name: form.name.trim() || `${user.firstName} ${user.lastName}`,
@@ -368,7 +351,7 @@ export default function CheckoutPage() {
 
         address: form.address.trim(),
 
-        customerId: profileRes.data.customerId,
+        customerId: form.customerId,
 
         paymentMethod,
 
@@ -394,7 +377,22 @@ export default function CheckoutPage() {
 
       const res = await axios.post(ORDER_API, payload, { headers: getAuthHeaders() });
 
+      const saveCustomerId = async () => {
+        const profileRes = await axios.patch(
+          `${import.meta.env.VITE_BACKEND_URL}/api/users/me/customer-id`,
+          { customerId: form.customerId },
+          { headers: getAuthHeaders() }
+        );
+        const stored = getStoredUser();
+        if (stored) {
+          localStorage.setItem(
+            "user",
+            JSON.stringify({ ...stored, customerId: profileRes.data.customerId })
+          );
+        }
+      };
 
+      await saveCustomerId();
 
       if (res.data.checkoutUrl) {
 
@@ -612,7 +610,7 @@ export default function CheckoutPage() {
 
                     <HiOutlineIdentification className="w-4 h-4" />
 
-                    Customer ID
+                    Customer ID *
 
                   </span>
 
@@ -636,7 +634,7 @@ export default function CheckoutPage() {
 
                   <span className="label-text-alt text-base-content/50 mt-1">
 
-                    {CUSTOMER_ID_HINT}
+                    Enter your ID here when placing an order — it will be saved to your account. {CUSTOMER_ID_HINT}
 
                   </span>
 

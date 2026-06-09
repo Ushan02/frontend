@@ -88,7 +88,7 @@ export default function LoginPage() {
           Sign In
         </h1>
         <p className="section-subtitle text-center mb-6">
-          Welcome back — sign in to continue. New here? Register and enter your customer ID.
+          Welcome back — sign in to continue.
         </p>
 
         {successMsg && <div className="alert-modern-success mb-4">{successMsg}</div>}
