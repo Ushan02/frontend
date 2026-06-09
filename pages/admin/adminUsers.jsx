@@ -7,6 +7,7 @@ import {
   HiOutlineShieldCheck,
 } from "react-icons/hi2";
 import { API_BASE, getAuthHeaders } from "../../src/lib/adminApi";
+import UserDetailModal from "../../components/UserDetailModal";
 
 const API = API_BASE + "/api/users";
 
@@ -48,7 +49,14 @@ export default function AdminUsers() {
   const [formError, setFormError] = useState("");
   const [formLoading, setFormLoading] = useState(false);
   const [success, setSuccess] = useState("");
+  const [selectedUser, setSelectedUser] = useState(null);
   const currentUserId = getCurrentUserId();
+
+  const handleUserUpdated = (updated) => {
+    setUsers((prev) => prev.map((u) => (u._id === updated._id ? { ...u, ...updated } : u)));
+    setSelectedUser((prev) => (prev?._id === updated._id ? { ...prev, ...updated } : prev));
+    setSuccess("User updated.");
+  };
 
   const fetchUsers = async () => {
     setLoading(true);
@@ -160,7 +168,9 @@ export default function AdminUsers() {
       <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-xl sm:text-2xl font-bold text-slate-800">Users</h1>
-          <p className="text-slate-500 text-sm mt-1">Manage customer and admin accounts</p>
+          <p className="text-slate-500 text-sm mt-1">
+            Manage customer and admin accounts — click a row to view and edit details
+          </p>
         </div>
         <button
           onClick={() => {
@@ -276,7 +286,11 @@ export default function AdminUsers() {
             </thead>
             <tbody className="divide-y divide-slate-100">
               {users.map((user) => (
-                <tr key={user._id} className="hover:bg-slate-50">
+                <tr
+                  key={user._id}
+                  onClick={() => setSelectedUser(user)}
+                  className="hover:bg-slate-50 cursor-pointer transition-colors"
+                >
                   <td className="px-5 py-3.5 text-sm font-medium text-slate-800">
                     {user.firstName} {user.lastName}
                     {user._id === currentUserId && (
@@ -301,7 +315,7 @@ export default function AdminUsers() {
                       {user.isBlock ? "Blocked" : "Active"}
                     </span>
                   </td>
-                  <td className="px-5 py-3.5">
+                  <td className="px-5 py-3.5" onClick={(e) => e.stopPropagation()}>
                     <div className="flex flex-wrap items-center gap-3">
                       {user.role !== "admin" ? (
                         <>
@@ -355,6 +369,13 @@ export default function AdminUsers() {
       {!loading && users.length > 0 && (
         <p className="text-sm text-slate-400 mt-4">{users.length} users</p>
       )}
+
+      <UserDetailModal
+        user={selectedUser}
+        currentUserId={currentUserId}
+        onClose={() => setSelectedUser(null)}
+        onUserUpdated={handleUserUpdated}
+      />
     </div>
   );
 }
