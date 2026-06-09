@@ -2,7 +2,12 @@ import { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import { HiOutlineXMark, HiOutlineWrenchScrewdriver } from "react-icons/hi2";
 import { API_BASE, getAuthHeaders } from "../src/lib/adminApi";
-import { formatCustomerIdInput, isValidCustomerId, normalizeCustomerId } from "../src/lib/customerId";
+import {
+  CUSTOMER_ID_HINT,
+  formatCustomerIdInput,
+  isValidCustomerId,
+  normalizeCustomerId,
+} from "../src/lib/customerId";
 
 const REPAIR_API = API_BASE + "/api/repairs";
 
@@ -91,7 +96,7 @@ export default function AdminAddRepairModal({ open, onClose, onSuccess }) {
     setError("");
 
     if (!isValidCustomerId(customerId)) {
-      setError("Enter a valid customer ID (10–11 digits + V).");
+      setError(CUSTOMER_ID_HINT);
       return;
     }
     if (!selectedProduct) {
@@ -158,11 +163,11 @@ export default function AdminAddRepairModal({ open, onClose, onSuccess }) {
               type="text"
               value={customerId}
               onChange={(e) => handleCustomerIdChange(e.target.value)}
-              placeholder="0771234567V"
+              placeholder="1999236512V"
               className="w-full border border-slate-300 rounded-lg px-3 py-2.5 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-blue-400"
               required
             />
-            <p className="text-xs text-slate-400 mt-1">10 or 11 digits ending with V</p>
+            <p className="text-xs text-slate-400 mt-1">{CUSTOMER_ID_HINT}</p>
             {lookupState === "loading" && (
               <p className="text-xs text-slate-500 mt-2">Looking up customer…</p>
             )}

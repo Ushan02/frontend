@@ -602,7 +602,7 @@ export default function CheckoutPage() {
 
                   <span className="label-text-alt text-base-content/50 mt-1">
 
-                    Your unique ID for orders and repairs (10–11 digits + V)
+                    10 or 11 numbers ending with V (e.g. 1999236512V)
 
                   </span>
 

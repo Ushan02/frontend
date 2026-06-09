@@ -1,6 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 import axios from "axios";
-import { formatCustomerIdInput, isValidCustomerId, normalizeCustomerId } from "../src/lib/customerId";
+import {
+  CUSTOMER_ID_HINT,
+  formatCustomerIdInput,
+  isValidCustomerId,
+  normalizeCustomerId,
+} from "../src/lib/customerId";
 import {
   HiOutlineXMark,
   HiOutlinePlus,
@@ -286,7 +291,7 @@ export default function AdminAddOrderModal({ open, onClose, onSuccess }) {
                   type="text"
                   value={form.customerId}
                   onChange={(e) => handleCustomerIdChange(e.target.value)}
-                  placeholder="0771234567V"
+                  placeholder="1999236512V"
                   className="mt-1 w-full px-3 py-2 rounded-lg border border-slate-200 text-sm font-mono"
                 />
                 {customerLookup === "loading" && (
@@ -298,6 +303,7 @@ export default function AdminAddOrderModal({ open, onClose, onSuccess }) {
                 {customerLookup === "not_found" && (
                   <span className="text-xs text-red-600 mt-1 block">Customer not found for this ID.</span>
                 )}
+                <span className="text-xs text-slate-400 mt-1 block">{CUSTOMER_ID_HINT}</span>
               </label>
               <label className="block sm:col-span-2">
                 <span className="text-xs font-medium text-slate-500 uppercase">Full name *</span>

@@ -58,6 +58,12 @@ export default function AdminUsers() {
     setSuccess("User updated.");
   };
 
+  const handleUserDeleted = (userId) => {
+    setUsers((prev) => prev.filter((u) => u._id !== userId));
+    setSelectedUser(null);
+    setSuccess("User deleted successfully.");
+  };
+
   const fetchUsers = async () => {
     setLoading(true);
     setError("");
@@ -375,6 +381,7 @@ export default function AdminUsers() {
         currentUserId={currentUserId}
         onClose={() => setSelectedUser(null)}
         onUserUpdated={handleUserUpdated}
+        onUserDeleted={handleUserDeleted}
       />
     </div>
   );

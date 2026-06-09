@@ -6,9 +6,14 @@ import {
   HiOutlineShieldCheck,
   HiOutlineNoSymbol,
   HiOutlineCheck,
+  HiOutlineTrash,
 } from "react-icons/hi2";
 import { API_BASE, getAuthHeaders } from "../src/lib/adminApi";
-import { formatCustomerIdInput } from "../src/lib/customerId";
+import {
+  CUSTOMER_ID_HINT,
+  formatCustomerIdInput,
+  isValidCustomerId,
+} from "../src/lib/customerId";
 
 const API = API_BASE + "/api/users";
 
@@ -29,6 +34,7 @@ export default function UserDetailModal({
   currentUserId,
   onClose,
   onUserUpdated,
+  onUserDeleted,
 }) {
   const [form, setForm] = useState({
     firstName: "",
@@ -38,6 +44,7 @@ export default function UserDetailModal({
     password: "",
   });
   const [saving, setSaving] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
@@ -66,6 +73,11 @@ export default function UserDetailModal({
 
     if (!form.firstName.trim() || !form.lastName.trim() || !form.email.trim()) {
       setError("First name, last name, and email are required.");
+      return;
+    }
+
+    if (isCustomer && form.customerId && !isValidCustomerId(form.customerId)) {
+      setError(CUSTOMER_ID_HINT);
       return;
     }
 
@@ -132,6 +144,31 @@ export default function UserDetailModal({
         setSuccess(res.data.message);
       })
       .catch((err) => setError(err.response?.data?.message || "Failed to update block status."));
+  };
+
+  const handleDelete = async () => {
+    if (
+      !window.confirm(
+        `Delete ${user.firstName} ${user.lastName}? This cannot be undone.`
+      )
+    ) {
+      return;
+    }
+
+    setDeleting(true);
+    setError("");
+    try {
+      const res = await axios.delete(`${API}/${user._id}`, {
+        headers: getAuthHeaders(),
+      });
+      onUserDeleted?.(user._id);
+      onClose();
+      alert(res.data.message);
+    } catch (err) {
+      setError(err.response?.data?.message || "Failed to delete user.");
+    } finally {
+      setDeleting(false);
+    }
   };
 
   return (
@@ -232,8 +269,9 @@ export default function UserDetailModal({
                       setForm((p) => ({ ...p, customerId: formatCustomerIdInput(e.target.value) }))
                     }
                     className="mt-1 w-full px-3 py-2.5 rounded-lg border border-slate-200 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-blue-400"
-                    placeholder="0771234567V"
+                    placeholder="1999236512V"
                   />
+                  <p className="text-xs text-slate-400 mt-1">{CUSTOMER_ID_HINT}</p>
                 </label>
               )}
               <label className="block sm:col-span-2">
@@ -301,6 +339,17 @@ export default function UserDetailModal({
                       Block
                     </>
                   )}
+                </button>
+              )}
+              {!isSelf && user.role !== "admin" && (
+                <button
+                  type="button"
+                  onClick={handleDelete}
+                  disabled={deleting}
+                  className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium bg-red-600 text-white hover:bg-red-700 disabled:opacity-60"
+                >
+                  <HiOutlineTrash className="w-4 h-4" />
+                  {deleting ? "Deleting…" : "Delete user"}
                 </button>
               )}
             </div>
