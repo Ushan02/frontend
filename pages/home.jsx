@@ -247,7 +247,7 @@ export default function HomePage() {
 
               <p className="text-base sm:text-lg text-primary-content/85 max-w-xl mb-8 leading-relaxed">
                 Discover gaming laptops, business notebooks, and premium accessories —
-                all in one place with smart filters and prices in RS.
+                all in one place.
               </p>
 
               <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
