@@ -8,6 +8,11 @@ import {
 } from "react-icons/hi2";
 import { API_BASE, getAuthHeaders } from "../../src/lib/adminApi";
 import UserDetailModal from "../../components/UserDetailModal";
+import {
+  CUSTOMER_ID_HINT,
+  formatCustomerIdInput,
+  isValidCustomerId,
+} from "../../src/lib/customerId";
 
 const API = API_BASE + "/api/users";
 
@@ -15,6 +20,7 @@ const EMPTY_FORM = {
   firstName: "",
   lastName: "",
   email: "",
+  customerId: "",
   password: "",
   role: "customer",
 };
@@ -144,6 +150,10 @@ export default function AdminUsers() {
       setFormError("Password must be at least 6 characters.");
       return;
     }
+    if (form.role === "customer" && !isValidCustomerId(form.customerId)) {
+      setFormError(CUSTOMER_ID_HINT);
+      return;
+    }
 
     setFormLoading(true);
     try {
@@ -155,6 +165,7 @@ export default function AdminUsers() {
           email: form.email.trim(),
           password: form.password,
           role: form.role,
+          ...(form.role === "customer" ? { customerId: form.customerId } : {}),
         },
         { headers: getAuthHeaders() }
       );
@@ -250,6 +261,21 @@ export default function AdminUsers() {
                 <option value="admin">Admin</option>
               </select>
             </div>
+            {form.role === "customer" && (
+              <div className="sm:col-span-2">
+                <label className="block text-sm font-medium text-slate-600 mb-1">Customer ID *</label>
+                <input
+                  type="text"
+                  value={form.customerId}
+                  onChange={(e) =>
+                    setForm({ ...form, customerId: formatCustomerIdInput(e.target.value) })
+                  }
+                  placeholder="1999236512V"
+                  className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-blue-400"
+                />
+                <p className="text-xs text-slate-400 mt-1">{CUSTOMER_ID_HINT}</p>
+              </div>
+            )}
           </div>
 
           {formError && (

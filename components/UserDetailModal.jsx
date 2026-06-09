@@ -76,9 +76,15 @@ export default function UserDetailModal({
       return;
     }
 
-    if (isCustomer && form.customerId && !isValidCustomerId(form.customerId)) {
-      setError(CUSTOMER_ID_HINT);
-      return;
+    if (isCustomer) {
+      if (!form.customerId.trim()) {
+        setError("Customer ID is required.");
+        return;
+      }
+      if (!isValidCustomerId(form.customerId)) {
+        setError(CUSTOMER_ID_HINT);
+        return;
+      }
     }
 
     setSaving(true);

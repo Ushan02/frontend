@@ -31,6 +31,11 @@ import { useCart } from "../src/context/CartContext";
 import { formatPrice } from "../src/lib/formatPrice";
 
 import { computePaymentSplit } from "../src/lib/paymentSplit";
+import {
+  CUSTOMER_ID_HINT,
+  formatCustomerIdInput,
+  isValidCustomerId,
+} from "../src/lib/customerId";
 
 
 
@@ -324,11 +329,36 @@ export default function CheckoutPage() {
 
     }
 
+    if (!isValidCustomerId(form.customerId)) {
+
+      setError(CUSTOMER_ID_HINT);
+
+      return;
+
+    }
+
 
 
     setSubmitting(true);
 
     try {
+
+      const profileRes = await axios.patch(
+        `${import.meta.env.VITE_BACKEND_URL}/api/users/me/customer-id`,
+        { customerId: form.customerId },
+        { headers: getAuthHeaders() }
+      );
+
+      const stored = getStoredUser();
+
+      if (stored) {
+
+        localStorage.setItem(
+          "user",
+          JSON.stringify({ ...stored, customerId: profileRes.data.customerId })
+        );
+
+      }
 
       const payload = {
 
@@ -338,7 +368,7 @@ export default function CheckoutPage() {
 
         address: form.address.trim(),
 
-        customerId: form.customerId || undefined,
+        customerId: profileRes.data.customerId,
 
         paymentMethod,
 
@@ -592,17 +622,21 @@ export default function CheckoutPage() {
 
                     value={form.customerId}
 
-                    readOnly
+                    onChange={(e) =>
+                      update("customerId", formatCustomerIdInput(e.target.value))
+                    }
 
-                    className="input input-bordered w-full mt-1 font-mono bg-base-200/60"
+                    className="input input-bordered w-full mt-1 font-mono"
 
-                    placeholder="Loading your customer ID…"
+                    placeholder="1999236512V"
+
+                    required
 
                   />
 
                   <span className="label-text-alt text-base-content/50 mt-1">
 
-                    10 or 11 numbers ending with V (e.g. 1999236512V)
+                    {CUSTOMER_ID_HINT}
 
                   </span>
 

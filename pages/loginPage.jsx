@@ -87,7 +87,9 @@ export default function LoginPage() {
           <HiOutlineArrowRightOnRectangle className="w-7 h-7 text-ocean" />
           Sign In
         </h1>
-        <p className="section-subtitle text-center mb-6">Welcome back — sign in to continue.</p>
+        <p className="section-subtitle text-center mb-6">
+          Welcome back — sign in to continue. New here? Register and enter your customer ID.
+        </p>
 
         {successMsg && <div className="alert-modern-success mb-4">{successMsg}</div>}
         {error && <div className="alert-modern-error mb-4">{error}</div>}

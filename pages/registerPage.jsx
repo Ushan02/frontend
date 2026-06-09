@@ -11,6 +11,11 @@ import {
   getGoogleAuthIssues,
   saveSessionAndRedirect,
 } from "../src/lib/auth";
+import {
+  CUSTOMER_ID_HINT,
+  formatCustomerIdInput,
+  isValidCustomerId,
+} from "../src/lib/customerId";
 
 const API = API_USERS;
 
@@ -19,6 +24,7 @@ export default function RegisterPage() {
     firstName: "",
     lastName: "",
     email: "",
+    customerId: "",
     password: "",
     confirmPassword: "",
   });
@@ -55,6 +61,10 @@ export default function RegisterPage() {
       setError("Password must be at least 6 characters.");
       return;
     }
+    if (!isValidCustomerId(form.customerId)) {
+      setError(CUSTOMER_ID_HINT);
+      return;
+    }
 
     setLoading(true);
     try {
@@ -62,6 +72,7 @@ export default function RegisterPage() {
         firstName: form.firstName,
         lastName: form.lastName,
         email: form.email,
+        customerId: form.customerId,
         password: form.password,
       });
       const idNote = res.data?.customerId
@@ -83,10 +94,15 @@ export default function RegisterPage() {
       setError("Google sign-in failed. Please try again.");
       return;
     }
+    if (!isValidCustomerId(form.customerId)) {
+      setError(`Enter your customer ID before signing up with Google. ${CUSTOMER_ID_HINT}`);
+      return;
+    }
     setLoading(true);
     try {
       const res = await axios.post(`${API}/google`, {
         credential: credentialResponse.credential,
+        customerId: form.customerId,
       });
       saveSessionAndRedirect({
         token: res.data.token,
@@ -116,28 +132,6 @@ export default function RegisterPage() {
         <p className="section-subtitle text-center mb-6">Join TechZone and start shopping today.</p>
 
         {error && <div className="alert-modern-error mb-4">{error}</div>}
-
-        {GOOGLE_CLIENT_ID && (
-          <div className="mb-6 flex justify-center">
-            <GoogleLogin
-              onSuccess={handleGoogleSuccess}
-              onError={() => setError("Google sign-in was cancelled or failed.")}
-              theme="outline"
-              size="large"
-              text="signup_with"
-              shape="rectangular"
-              width="320"
-            />
-          </div>
-        )}
-
-        {GOOGLE_CLIENT_ID && (
-          <div className="flex items-center gap-3 mb-6">
-            <div className="flex-1 h-px bg-sky/40" />
-            <span className="text-xs text-base-content/40 uppercase tracking-wide">or</span>
-            <div className="flex-1 h-px bg-sky/40" />
-          </div>
-        )}
 
         <div className="flex flex-col sm:flex-row gap-3 mb-4">
           <div className="flex-1">
@@ -174,6 +168,19 @@ export default function RegisterPage() {
           className="input-field mb-4"
         />
 
+        <label className="block text-sm font-semibold text-base-content/70 mb-1.5">Customer ID *</label>
+        <input
+          type="text"
+          placeholder="1999236512V"
+          value={form.customerId}
+          onChange={(e) =>
+            setForm({ ...form, customerId: formatCustomerIdInput(e.target.value) })
+          }
+          onKeyDown={handleKeyDown}
+          className="input-field mb-1 font-mono"
+        />
+        <p className="text-xs text-base-content/50 mb-4">{CUSTOMER_ID_HINT}</p>
+
         <label className="block text-sm font-semibold text-base-content/70 mb-1.5">Password</label>
         <input
           type="password"
@@ -197,6 +204,27 @@ export default function RegisterPage() {
         <button onClick={handleRegister} disabled={loading} className="btn-brand w-full">
           {loading ? "Creating account…" : "Create account"}
         </button>
+
+        {GOOGLE_CLIENT_ID && (
+          <>
+            <div className="flex items-center gap-3 my-6">
+              <div className="flex-1 h-px bg-sky/40" />
+              <span className="text-xs text-base-content/40 uppercase tracking-wide">or</span>
+              <div className="flex-1 h-px bg-sky/40" />
+            </div>
+            <div className="flex justify-center">
+              <GoogleLogin
+                onSuccess={handleGoogleSuccess}
+                onError={() => setError("Google sign-in was cancelled or failed.")}
+                theme="outline"
+                size="large"
+                text="signup_with"
+                shape="rectangular"
+                width="320"
+              />
+            </div>
+          </>
+        )}
 
         <p className="text-center text-sm text-base-content/55 mt-5">
           Already have an account?{" "}
