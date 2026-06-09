@@ -275,7 +275,7 @@ export default function UserDetailModal({
                       setForm((p) => ({ ...p, customerId: formatCustomerIdInput(e.target.value) }))
                     }
                     className="mt-1 w-full px-3 py-2.5 rounded-lg border border-slate-200 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-blue-400"
-                    placeholder="1999236512V"
+                    placeholder="200205202165 or 12345678901V"
                   />
                   <p className="text-xs text-slate-400 mt-1">{CUSTOMER_ID_HINT}</p>
                 </label>

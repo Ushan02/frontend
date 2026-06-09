@@ -626,7 +626,7 @@ export default function CheckoutPage() {
 
                     className="input input-bordered w-full mt-1 font-mono"
 
-                    placeholder="1999236512V"
+                    placeholder="200205202165 or 12345678901V"
 
                     required
 

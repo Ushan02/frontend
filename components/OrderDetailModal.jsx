@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 
 import axios from "axios";
 
@@ -180,7 +181,21 @@ export default function OrderDetailModal({ order, onClose, onOrderUpdated }) {
 
   });
 
+  useEffect(() => {
+    if (!order) return undefined;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [order]);
 
+  useEffect(() => {
+    setPayError("");
+    setBillEmailMsg("");
+    setPayLoading(false);
+    setPos({ posTransactionRef: "", posMachineId: "", posNotes: "" });
+  }, [order?.orderId]);
 
   if (!order) return null;
 
@@ -288,7 +303,7 @@ export default function OrderDetailModal({ order, onClose, onOrderUpdated }) {
 
 
 
-  return (
+  return createPortal(
 
     <>
 
@@ -298,7 +313,7 @@ export default function OrderDetailModal({ order, onClose, onOrderUpdated }) {
 
     </div>
 
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 no-print">
+    <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 no-print">
 
       <button
 
@@ -766,7 +781,9 @@ export default function OrderDetailModal({ order, onClose, onOrderUpdated }) {
 
     </div>
 
-    </>
+    </>,
+
+    document.body
 
   );
 

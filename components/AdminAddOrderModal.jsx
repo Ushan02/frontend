@@ -291,7 +291,7 @@ export default function AdminAddOrderModal({ open, onClose, onSuccess }) {
                   type="text"
                   value={form.customerId}
                   onChange={(e) => handleCustomerIdChange(e.target.value)}
-                  placeholder="1999236512V"
+                  placeholder="200205202165 or 12345678901V"
                   className="mt-1 w-full px-3 py-2 rounded-lg border border-slate-200 text-sm font-mono"
                 />
                 {customerLookup === "loading" && (

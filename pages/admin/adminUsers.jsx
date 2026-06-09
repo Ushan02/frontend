@@ -270,7 +270,7 @@ export default function AdminUsers() {
                   onChange={(e) =>
                     setForm({ ...form, customerId: formatCustomerIdInput(e.target.value) })
                   }
-                  placeholder="1999236512V"
+                  placeholder="200205202165 or 12345678901V"
                   className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-blue-400"
                 />
                 <p className="text-xs text-slate-400 mt-1">{CUSTOMER_ID_HINT}</p>

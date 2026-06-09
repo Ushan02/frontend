@@ -430,19 +430,13 @@ body,
 
 /* ─── Order bill print ─── */
 @media print {
-  body * {
-    visibility: hidden;
-  }
-
-  #order-bill-print,
-  #order-bill-print * {
-    visibility: visible;
+  body > *:not(#order-bill-print) {
+    display: none !important;
   }
 
   #order-bill-print {
-    position: absolute;
-    left: 0;
-    top: 0;
+    display: block !important;
+    position: static;
     width: 100%;
     padding: 1.5rem;
     background: #fff;

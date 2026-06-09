@@ -163,7 +163,7 @@ export default function AdminAddRepairModal({ open, onClose, onSuccess }) {
               type="text"
               value={customerId}
               onChange={(e) => handleCustomerIdChange(e.target.value)}
-              placeholder="1999236512V"
+              placeholder="200205202165 or 12345678901V"
               className="w-full border border-slate-300 rounded-lg px-3 py-2.5 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-blue-400"
               required
             />
