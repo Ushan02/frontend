@@ -1,16 +1,11 @@
 export const CUSTOMER_ID_REGEX = /^\d{10,11}V$/;
 
-export const CUSTOMER_ID_HINT = "10 or 11 numbers ending with V (e.g. 1999236512V or 20020520216V)";
+export const CUSTOMER_ID_HINT =
+  "Type 10 or 11 numbers then V at the end (e.g. 1999236512V)";
 
 export function normalizeCustomerId(value) {
   if (!value) return "";
-  let trimmed = String(value).trim();
-  if (/[vV]$/.test(trimmed)) {
-    trimmed = trimmed.slice(0, -1);
-  }
-  const digits = trimmed.replace(/\D/g, "");
-  if (!digits) return "";
-  return `${digits}V`;
+  return String(value).trim().toUpperCase();
 }
 
 export function isValidCustomerId(value) {
@@ -21,11 +16,8 @@ export function isValidCustomerId(value) {
 }
 
 export function formatCustomerIdInput(value) {
-  let raw = String(value).trim();
-  if (/[vV]$/.test(raw)) {
-    raw = raw.slice(0, -1);
-  }
-  const digits = raw.replace(/\D/g, "").slice(0, 11);
-  if (!digits) return "";
-  return `${digits}V`;
+  return String(value)
+    .toUpperCase()
+    .replace(/[^0-9V]/g, "")
+    .slice(0, 12);
 }
