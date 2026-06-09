@@ -22,6 +22,8 @@ import {
 
   HiOutlineShoppingCart,
 
+  HiOutlineIdentification,
+
 } from "react-icons/hi2";
 
 import { useCart } from "../src/context/CartContext";
@@ -105,6 +107,8 @@ export default function CheckoutPage() {
     phone: "",
 
     address: "",
+
+    customerId: user?.customerId || "",
 
   });
 
@@ -193,6 +197,52 @@ export default function CheckoutPage() {
         setPaymentMethod("cod");
 
       });
+
+  }, []);
+
+
+
+  useEffect(() => {
+
+    axios
+
+      .get(`${import.meta.env.VITE_BACKEND_URL}/api/users/me`, { headers: getAuthHeaders() })
+
+      .then((res) => {
+
+        const profile = res.data;
+
+        setForm((prev) => ({
+
+          ...prev,
+
+          name: prev.name || `${profile.firstName} ${profile.lastName}`.trim(),
+
+          customerId: profile.customerId || "",
+
+        }));
+
+        if (profile.customerId) {
+
+          const stored = getStoredUser();
+
+          if (stored) {
+
+            localStorage.setItem(
+
+              "user",
+
+              JSON.stringify({ ...stored, customerId: profile.customerId })
+
+            );
+
+          }
+
+        }
+
+      })
+
+      .catch(() => {});
 
   }, []);
 
@@ -287,6 +337,8 @@ export default function CheckoutPage() {
         phone,
 
         address: form.address.trim(),
+
+        customerId: form.customerId || undefined,
 
         paymentMethod,
 
@@ -519,6 +571,40 @@ export default function CheckoutPage() {
                     required
 
                   />
+
+                </label>
+
+
+
+                <label className="form-control w-full">
+
+                  <span className="label-text font-medium flex items-center gap-2">
+
+                    <HiOutlineIdentification className="w-4 h-4" />
+
+                    Customer ID
+
+                  </span>
+
+                  <input
+
+                    type="text"
+
+                    value={form.customerId}
+
+                    readOnly
+
+                    className="input input-bordered w-full mt-1 font-mono bg-base-200/60"
+
+                    placeholder="Loading your customer ID…"
+
+                  />
+
+                  <span className="label-text-alt text-base-content/50 mt-1">
+
+                    Your unique ID for orders and repairs (10–11 digits + V)
+
+                  </span>
 
                 </label>
 

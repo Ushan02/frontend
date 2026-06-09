@@ -267,6 +267,7 @@ export default function AdminUsers() {
             <thead className="bg-slate-50 text-slate-600 border-b border-slate-200">
               <tr>
                 <th className="px-5 py-3.5 text-xs font-semibold uppercase">Name</th>
+                <th className="px-5 py-3.5 text-xs font-semibold uppercase">Customer ID</th>
                 <th className="px-5 py-3.5 text-xs font-semibold uppercase">Email</th>
                 <th className="px-5 py-3.5 text-xs font-semibold uppercase">Role</th>
                 <th className="px-5 py-3.5 text-xs font-semibold uppercase">Status</th>
@@ -281,6 +282,9 @@ export default function AdminUsers() {
                     {user._id === currentUserId && (
                       <span className="ml-2 text-xs text-slate-400">(you)</span>
                     )}
+                  </td>
+                  <td className="px-5 py-3.5 text-sm font-mono text-slate-600">
+                    {user.customerId || "—"}
                   </td>
                   <td className="px-5 py-3.5 text-sm text-slate-600">{user.email}</td>
                   <td className="px-5 py-3.5">

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import axios from "axios";
+import { formatCustomerIdInput, isValidCustomerId, normalizeCustomerId } from "../src/lib/customerId";
 import {
   HiOutlineXMark,
   HiOutlinePlus,
@@ -30,6 +31,7 @@ const ORDER_STATUS_OPTIONS = [
 const DEFAULT_ORDER_STATUS = "delivered";
 
 const PRODUCTS_API = API_BASE + "/api/products";
+const REPAIR_API = API_BASE + "/api/repairs";
 
 const emptyLine = () => ({
   productId: "",
@@ -41,6 +43,7 @@ const emptyLine = () => ({
 
 export default function AdminAddOrderModal({ open, onClose, onSuccess }) {
   const [form, setForm] = useState({
+    customerId: "",
     name: "",
     email: "",
     phone: "",
@@ -49,6 +52,7 @@ export default function AdminAddOrderModal({ open, onClose, onSuccess }) {
     cashPercent: 50,
     status: DEFAULT_ORDER_STATUS,
   });
+  const [customerLookup, setCustomerLookup] = useState("idle");
   const [lines, setLines] = useState([emptyLine()]);
   const [pos, setPos] = useState({
     posTransactionRef: "",
@@ -58,10 +62,12 @@ export default function AdminAddOrderModal({ open, onClose, onSuccess }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const lookupTimers = useRef({});
+  const customerLookupTimer = useRef(null);
 
   useEffect(() => {
     if (!open) return;
     setForm({
+      customerId: "",
       name: "",
       email: "",
       phone: "",
@@ -70,6 +76,7 @@ export default function AdminAddOrderModal({ open, onClose, onSuccess }) {
       cashPercent: 50,
       status: DEFAULT_ORDER_STATUS,
     });
+    setCustomerLookup("idle");
     setLines([emptyLine()]);
     setPos({ posTransactionRef: "", posMachineId: "", posNotes: "" });
     setError("");
@@ -78,8 +85,42 @@ export default function AdminAddOrderModal({ open, onClose, onSuccess }) {
   useEffect(() => {
     return () => {
       Object.values(lookupTimers.current).forEach(clearTimeout);
+      if (customerLookupTimer.current) clearTimeout(customerLookupTimer.current);
     };
   }, []);
+
+  const lookupCustomer = async (rawId) => {
+    const normalized = normalizeCustomerId(rawId);
+    if (!isValidCustomerId(normalized)) {
+      setCustomerLookup("invalid");
+      return;
+    }
+
+    setCustomerLookup("loading");
+    try {
+      const res = await axios.get(`${REPAIR_API}/customer-lookup`, {
+        params: { customerId: normalized },
+        headers: getAuthHeaders(),
+      });
+      const customer = res.data.customer;
+      setForm((prev) => ({
+        ...prev,
+        customerId: normalized,
+        name: `${customer.firstName} ${customer.lastName}`.trim(),
+        email: customer.email,
+      }));
+      setCustomerLookup("found");
+    } catch {
+      setCustomerLookup("not_found");
+    }
+  };
+
+  const handleCustomerIdChange = (value) => {
+    const formatted = formatCustomerIdInput(value);
+    setForm((prev) => ({ ...prev, customerId: formatted }));
+    if (customerLookupTimer.current) clearTimeout(customerLookupTimer.current);
+    customerLookupTimer.current = setTimeout(() => lookupCustomer(formatted), 450);
+  };
 
   const lookupProduct = (index, productId) => {
     const id = productId.trim();
@@ -155,6 +196,7 @@ export default function AdminAddOrderModal({ open, onClose, onSuccess }) {
       .filter((line) => line.productId);
 
     return {
+      customerId: form.customerId.trim() || undefined,
       name: form.name.trim(),
       email: form.email.trim(),
       phone: Number(String(form.phone).replace(/\D/g, "")),
@@ -238,6 +280,25 @@ export default function AdminAddOrderModal({ open, onClose, onSuccess }) {
           <section className="space-y-3">
             <h3 className="text-sm font-semibold text-slate-800">Customer details</h3>
             <div className="grid sm:grid-cols-2 gap-3">
+              <label className="block sm:col-span-2">
+                <span className="text-xs font-medium text-slate-500 uppercase">Customer ID</span>
+                <input
+                  type="text"
+                  value={form.customerId}
+                  onChange={(e) => handleCustomerIdChange(e.target.value)}
+                  placeholder="0771234567V"
+                  className="mt-1 w-full px-3 py-2 rounded-lg border border-slate-200 text-sm font-mono"
+                />
+                {customerLookup === "loading" && (
+                  <span className="text-xs text-slate-500 mt-1 block">Looking up customer…</span>
+                )}
+                {customerLookup === "found" && (
+                  <span className="text-xs text-emerald-700 mt-1 block">Customer found — name and email filled.</span>
+                )}
+                {customerLookup === "not_found" && (
+                  <span className="text-xs text-red-600 mt-1 block">Customer not found for this ID.</span>
+                )}
+              </label>
               <label className="block sm:col-span-2">
                 <span className="text-xs font-medium text-slate-500 uppercase">Full name *</span>
                 <input

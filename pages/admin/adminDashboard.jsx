@@ -7,21 +7,23 @@ import {
   HiOutlineShoppingCart,
   HiOutlineStar,
   HiOutlineChatBubbleLeftRight,
+  HiOutlineWrenchScrewdriver,
 } from "react-icons/hi2";
 import { API_BASE, getAuthHeaders } from "../../src/lib/adminApi";
 
 export default function AdminDashboard() {
-  const [stats, setStats] = useState({ products: 0, users: 0, orders: 0, reviews: 0, messages: 0 });
+  const [stats, setStats] = useState({ products: 0, users: 0, orders: 0, repairs: 0, reviews: 0, messages: 0 });
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function load() {
       const headers = getAuthHeaders();
       try {
-        const [products, users, orders, reviews, messages] = await Promise.all([
+        const [products, users, orders, repairs, reviews, messages] = await Promise.all([
           axios.get(`${API_BASE}/api/products`, { headers }),
           axios.get(`${API_BASE}/api/users`, { headers }),
           axios.get(`${API_BASE}/api/order`, { headers }),
+          axios.get(`${API_BASE}/api/repairs`, { headers }),
           axios.get(`${API_BASE}/api/review`, { headers }),
           axios.get(`${API_BASE}/api/contact`, { headers }),
         ]);
@@ -29,6 +31,7 @@ export default function AdminDashboard() {
           products: products.data?.length ?? 0,
           users: users.data?.length ?? 0,
           orders: orders.data?.length ?? 0,
+          repairs: repairs.data?.length ?? 0,
           reviews: reviews.data?.length ?? 0,
           messages: messages.data?.length ?? 0,
         });
@@ -45,6 +48,7 @@ export default function AdminDashboard() {
     { label: "Products", count: stats.products, to: "/admin/products", Icon: HiOutlineCube, color: "bg-blue-500" },
     { label: "Users", count: stats.users, to: "/admin/users", Icon: HiOutlineUsers, color: "bg-emerald-500" },
     { label: "Orders", count: stats.orders, to: "/admin/orders", Icon: HiOutlineShoppingCart, color: "bg-amber-500" },
+    { label: "Repairs", count: stats.repairs, to: "/admin/repairs", Icon: HiOutlineWrenchScrewdriver, color: "bg-cyan-600" },
     { label: "Reviews", count: stats.reviews, to: "/admin/reviews", Icon: HiOutlineStar, color: "bg-purple-500" },
     { label: "Messages", count: stats.messages, to: "/admin/messages", Icon: HiOutlineChatBubbleLeftRight, color: "bg-rose-500" },
   ];

@@ -58,13 +58,18 @@ export default function RegisterPage() {
 
     setLoading(true);
     try {
-      await axios.post(import.meta.env.VITE_BACKEND_URL + "/api/users/", {
+      const res = await axios.post(import.meta.env.VITE_BACKEND_URL + "/api/users/", {
         firstName: form.firstName,
         lastName: form.lastName,
         email: form.email,
         password: form.password,
       });
-      navigate("/login", { state: { message: "Account created! Please sign in." } });
+      const idNote = res.data?.customerId
+        ? ` Your customer ID is ${res.data.customerId}.`
+        : "";
+      navigate("/login", {
+        state: { message: `Account created! Please sign in.${idNote}` },
+      });
     } catch (err) {
       setError(err.response?.data?.message || "Registration failed. Please try again.");
     } finally {
