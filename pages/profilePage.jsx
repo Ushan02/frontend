@@ -3,17 +3,10 @@ import axios from "axios";
 import {
   HiOutlineUser,
   HiOutlineEnvelope,
-  HiOutlineLockClosed,
   HiOutlineIdentification,
 } from "react-icons/hi2";
-import { API_USERS } from "../src/lib/auth";
+import { API_USERS, saveSession } from "../src/lib/auth";
 import { getAuthHeaders } from "../src/lib/adminApi";
-
-function syncStoredSession(user, token) {
-  localStorage.setItem("user", JSON.stringify(user));
-  if (token) localStorage.setItem("token", token);
-  window.dispatchEvent(new Event("user-session-updated"));
-}
 
 export default function ProfilePage() {
   const [profile, setProfile] = useState(null);
@@ -21,7 +14,6 @@ export default function ProfilePage() {
     firstName: "",
     lastName: "",
     email: "",
-    password: "",
   });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -42,7 +34,6 @@ export default function ProfilePage() {
           firstName: res.data.firstName || "",
           lastName: res.data.lastName || "",
           email: res.data.email || "",
-          password: "",
         });
       } catch (err) {
         if (!cancelled) {
@@ -78,14 +69,10 @@ export default function ProfilePage() {
         lastName: form.lastName.trim(),
         email: form.email.trim(),
       };
-      if (form.password.trim()) {
-        payload.password = form.password;
-      }
 
       const res = await axios.patch(`${API_USERS}/me`, payload, { headers: getAuthHeaders() });
       setProfile(res.data.user);
-      syncStoredSession(res.data.user, res.data.token);
-      setForm((prev) => ({ ...prev, password: "" }));
+      saveSession({ token: res.data.token, user: res.data.user });
       setSuccess(res.data.message || "Profile updated.");
     } catch (err) {
       setError(err.response?.data?.message || "Failed to update profile.");
@@ -114,8 +101,6 @@ export default function ProfilePage() {
     );
   }
 
-  const isGoogle = profile.authProvider === "google";
-
   return (
     <div className="page-shell flex-1 min-w-0">
       <div className="page-container max-w-xl py-6 sm:py-10 w-full">
@@ -129,7 +114,7 @@ export default function ProfilePage() {
             My Profile
           </h1>
           <p className="text-base-content/60 mt-2 text-sm sm:text-base">
-            Update your name, email, and password. Customer ID is read-only.
+            Update your name and email. Customer ID is read-only.
           </p>
         </div>
 
@@ -198,28 +183,6 @@ export default function ProfilePage() {
               </p>
             </div>
           )}
-
-          <div>
-            <label className="block text-sm font-semibold text-base-content/70 mb-1.5">
-              {isGoogle ? "Set a password (optional)" : "New password (optional)"}
-            </label>
-            <div className="relative">
-              <HiOutlineLockClosed className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-base-content/40 pointer-events-none" />
-              <input
-                type="password"
-                value={form.password}
-                onChange={set("password")}
-                placeholder="Leave blank to keep current password"
-                className="input-field input-field-icon"
-                autoComplete="new-password"
-              />
-            </div>
-            {isGoogle && (
-              <p className="text-xs text-base-content/50 mt-1.5">
-                You signed in with Google. Add a password here if you also want email sign-in.
-              </p>
-            )}
-          </div>
 
           <button type="submit" disabled={saving} className="btn-brand w-full sm:w-auto">
             {saving ? "Saving…" : "Save changes"}

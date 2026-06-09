@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useState, useCallback } from "react";
+import { SESSION_UPDATED_EVENT } from "../lib/auth";
 
 const GUEST_CART_KEY = "cart_guest";
 
@@ -49,6 +50,12 @@ export function CartProvider({ children }) {
   const reloadCart = useCallback(() => {
     setItems(loadCartForCurrentUser());
   }, []);
+
+  useEffect(() => {
+    const onSessionChange = () => reloadCart();
+    window.addEventListener(SESSION_UPDATED_EVENT, onSessionChange);
+    return () => window.removeEventListener(SESSION_UPDATED_EVENT, onSessionChange);
+  }, [reloadCart]);
 
   const addToCart = useCallback((product, quantity = 1) => {
     if (Number(product?.stock ?? 0) === 0) {

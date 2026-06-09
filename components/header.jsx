@@ -15,6 +15,7 @@ import {
   HiOutlineUser,
 } from "react-icons/hi2";
 import { useCart } from "../src/context/CartContext";
+import { clearSession, SESSION_UPDATED_EVENT } from "../src/lib/auth";
 import Logo from "./Logo";
 
 function getStoredUser() {
@@ -56,8 +57,8 @@ export default function Header() {
 
   useEffect(() => {
     const syncUser = () => setUser(getStoredUser());
-    window.addEventListener("user-session-updated", syncUser);
-    return () => window.removeEventListener("user-session-updated", syncUser);
+    window.addEventListener(SESSION_UPDATED_EVENT, syncUser);
+    return () => window.removeEventListener(SESSION_UPDATED_EVENT, syncUser);
   }, []);
 
   useEffect(() => {
@@ -74,11 +75,10 @@ export default function Header() {
   const closeMenu = () => setMenuOpen(false);
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
+    clearSession();
     reloadCart();
     closeMenu();
-    navigate("/login");
+    navigate("/", { replace: true });
   };
 
   const navLinks = (

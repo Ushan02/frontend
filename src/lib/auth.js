@@ -1,6 +1,23 @@
-export function saveSessionAndRedirect({ token, user, navigate, location, reloadCart }) {
+export const SESSION_UPDATED_EVENT = "user-session-updated";
+
+export function notifySessionUpdated() {
+  window.dispatchEvent(new Event(SESSION_UPDATED_EVENT));
+}
+
+export function saveSession({ token, user }) {
   localStorage.setItem("token", token);
   localStorage.setItem("user", JSON.stringify(user));
+  notifySessionUpdated();
+}
+
+export function clearSession() {
+  localStorage.removeItem("token");
+  localStorage.removeItem("user");
+  notifySessionUpdated();
+}
+
+export function saveSessionAndRedirect({ token, user, navigate, location, reloadCart }) {
+  saveSession({ token, user });
   reloadCart();
 
   const redirectTo = location.state?.from;
