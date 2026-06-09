@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link, useNavigate, useLocation } from "react-router-dom";
+import { Link, NavLink, useNavigate, useLocation } from "react-router-dom";
 import {
   HiOutlineHome,
   HiOutlineCog6Tooth,
@@ -12,6 +12,7 @@ import {
   HiOutlineXMark,
   HiOutlineInformationCircle,
   HiOutlineClipboardDocumentList,
+  HiOutlineUser,
 } from "react-icons/hi2";
 import { useCart } from "../src/context/CartContext";
 import Logo from "./Logo";
@@ -25,25 +26,39 @@ function getStoredUser() {
   }
 }
 
-function NavLinkItem({ to, children, icon: Icon, className = "", onClick }) {
+const navLinkClass = ({ isActive }) =>
+  `font-medium transition flex items-center gap-2 min-h-11 ${
+    isActive
+      ? "text-sky border-b-2 border-sky"
+      : "text-white hover:text-sky"
+  }`;
+
+function NavLinkItem({ to, children, icon: Icon, end, className = "", onClick }) {
   return (
-    <Link
+    <NavLink
       to={to}
+      end={end}
       onClick={onClick}
-      className={`hover:text-sky font-medium transition flex items-center gap-2 min-h-11 ${className}`}
+      className={({ isActive }) => `${navLinkClass({ isActive })} ${className}`}
     >
       {Icon && <Icon className="w-5 h-5 shrink-0" />}
       {children}
-    </Link>
+    </NavLink>
   );
 }
 
 export default function Header() {
   const navigate = useNavigate();
   const location = useLocation();
-  const user = getStoredUser();
+  const [user, setUser] = useState(getStoredUser);
   const { cartCount, reloadCart } = useCart();
   const [menuOpen, setMenuOpen] = useState(false);
+
+  useEffect(() => {
+    const syncUser = () => setUser(getStoredUser());
+    window.addEventListener("user-session-updated", syncUser);
+    return () => window.removeEventListener("user-session-updated", syncUser);
+  }, []);
 
   useEffect(() => {
     setMenuOpen(false);
@@ -68,7 +83,7 @@ export default function Header() {
 
   const navLinks = (
     <>
-      <NavLinkItem to="/" icon={HiOutlineHome} onClick={closeMenu}>
+      <NavLinkItem to="/" icon={HiOutlineHome} end onClick={closeMenu}>
         Home
       </NavLinkItem>
       <NavLinkItem to="/products" icon={HiOutlineShoppingBag} onClick={closeMenu}>
@@ -77,10 +92,12 @@ export default function Header() {
       <NavLinkItem to="/about" icon={HiOutlineInformationCircle} onClick={closeMenu}>
         About
       </NavLinkItem>
-      <Link
+      <NavLink
         to="/cart"
         onClick={closeMenu}
-        className="relative hover:text-sky font-medium transition flex items-center gap-2 min-h-11"
+        className={({ isActive }) =>
+          `relative ${navLinkClass({ isActive })}`
+        }
       >
         <HiOutlineShoppingCart className="w-5 h-5 shrink-0" />
         Cart
@@ -89,9 +106,12 @@ export default function Header() {
             {cartCount > 99 ? "99+" : cartCount}
           </span>
         )}
-      </Link>
+      </NavLink>
       {user ? (
         <>
+          <NavLinkItem to="/profile" icon={HiOutlineUser} onClick={closeMenu}>
+            My Profile
+          </NavLinkItem>
           {user.role !== "admin" && (
             <NavLinkItem to="/my-orders" icon={HiOutlineClipboardDocumentList} onClick={closeMenu}>
               My Orders
@@ -102,7 +122,7 @@ export default function Header() {
               Admin
             </NavLinkItem>
           )}
-          <span className="text-sky text-sm py-2 lg:py-0">
+          <span className="text-sky/90 text-sm py-2 lg:py-0 hidden xl:inline">
             Hi, {user.firstName}
           </span>
           <button
