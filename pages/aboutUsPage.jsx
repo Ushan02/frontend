@@ -48,7 +48,7 @@ const contactDetails = [
   {
     icon: HiOutlineClock,
     title: "Business hours",
-    lines: ["Mon – Fri: 9:00 AM – 6:00 PM", "Sat: 9:00 AM – 1:00 PM"],
+    lines: ["Mon – Fri: 9:00 AM – 6:00 PM", "Sat – Sun: 9:00 AM – 8:00 PM"],
   },
 ];
 
@@ -397,7 +397,7 @@ export default function AboutUsPage() {
             <h2 className="text-xl sm:text-2xl font-extrabold tracking-tight mb-3">Ready to explore?</h2>
             <p className="text-white/75 mb-6 text-sm sm:text-base">
               Browse gaming laptops, business notebooks, and accessories — filter by brand,
-              specs, and price in RS.
+              specs.
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <Link
