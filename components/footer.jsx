@@ -93,7 +93,7 @@ export default function Footer() {
             </Link>
             <p className="text-sm text-sky/80 leading-relaxed mb-5">
               Sri Lanka&apos;s laptop & tech store — gaming rigs, business notebooks, and
-              accessories with prices in RS.
+              accessories
             </p>
             <div className="flex items-center gap-2.5">
               {SOCIAL_LINKS.map((social) => {

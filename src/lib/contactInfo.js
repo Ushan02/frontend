@@ -1,5 +1,5 @@
-export const CONTACT_EMAIL = "support@myapp.lk";
-export const CONTACT_PHONE = "+94 11 000 0000";
+export const CONTACT_EMAIL = "ushansanuka2023@gmail.com";
+export const CONTACT_PHONE = "0714780482";
 export const CONTACT_ADDRESS = "123 Tech Street, Colombo 03, Sri Lanka";
 
 export const SOCIAL_LINKS = [
@@ -25,7 +25,7 @@ export const SOCIAL_LINKS = [
   },
   {
     label: "WhatsApp",
-    href: "https://wa.me/94110000000",
+    href: "https://wa.me/94714780482",
     icon: "whatsapp",
   },
 ];
