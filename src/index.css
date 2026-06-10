@@ -340,91 +340,118 @@ body,
   color: #b91c1c;
 }
 
-/* ─── Mobile typography (readable on phones, 16px base avoids iOS input zoom) ─── */
+/* ─── Mobile typography (slightly compact; inputs stay 16px to avoid iOS zoom) ─── */
 @media (max-width: 639px) {
   html {
-    font-size: 16px;
+    font-size: 15px;
   }
 
   body {
-    font-size: 1rem;
+    font-size: 0.9375rem;
     line-height: 1.5;
   }
 
   .section-eyebrow {
-    font-size: 0.8125rem;
+    font-size: 0.75rem;
   }
 
   .section-title {
-    font-size: clamp(1.625rem, 5vw, 2rem);
+    font-size: clamp(1.375rem, 4.5vw, 1.625rem);
   }
 
   .section-subtitle {
-    font-size: 1rem;
-    line-height: 1.65;
+    font-size: 0.875rem;
+    line-height: 1.55;
   }
 
   .input-field,
   .search-field {
-    font-size: 1rem;
-    min-height: 3rem;
+    font-size: 16px;
+    min-height: 2.875rem;
   }
 
   .btn-brand {
-    font-size: 1rem;
-    min-height: 3rem;
-  }
-
-  .pill-tab {
     font-size: 0.9375rem;
     min-height: 2.875rem;
   }
 
+  .pill-tab {
+    font-size: 0.8125rem;
+    min-height: 2.75rem;
+  }
+
   .alert-modern-success,
   .alert-modern-error {
-    font-size: 0.9375rem;
-    line-height: 1.5;
+    font-size: 0.8125rem;
+    line-height: 1.45;
   }
 
   .discount-badge-sm {
-    font-size: 0.6875rem;
+    font-size: 0.625rem;
   }
 
   .discount-badge-md {
-    font-size: 0.8125rem;
+    font-size: 0.75rem;
   }
 
-  /* Bump Tailwind small text utilities on mobile */
   .text-xs {
+    font-size: 0.75rem !important;
+    line-height: 1.125rem;
+  }
+
+  .text-sm {
     font-size: 0.8125rem !important;
     line-height: 1.25rem;
   }
 
-  .text-sm {
+  .text-base {
     font-size: 0.9375rem !important;
     line-height: 1.375rem;
+  }
+
+  .text-lg {
+    font-size: 1rem !important;
+    line-height: 1.5rem;
+  }
+
+  .text-xl {
+    font-size: 1.125rem !important;
+    line-height: 1.5rem;
+  }
+
+  .text-2xl {
+    font-size: 1.375rem !important;
+    line-height: 1.75rem;
+  }
+
+  .text-3xl {
+    font-size: 1.625rem !important;
+    line-height: 2rem;
+  }
+
+  .text-4xl {
+    font-size: 1.875rem !important;
+    line-height: 2.125rem;
   }
 
   .text-\[9px\],
   .text-\[10px\],
   .text-\[11px\] {
-    font-size: 0.75rem !important;
-    line-height: 1.125rem;
+    font-size: 0.6875rem !important;
+    line-height: 1rem;
   }
 
-  /* Mobile nav & header */
   header nav a,
   header nav button {
-    font-size: 1rem;
+    font-size: 0.9375rem;
   }
 
-  /* Tables stay legible when scrolled horizontally */
   table th {
-    font-size: 0.8125rem;
+    font-size: 0.75rem;
   }
 
   table td {
-    font-size: 0.9375rem;
+    font-size: 0.8125rem;
   }
 }
 
