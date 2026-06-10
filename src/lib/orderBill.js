@@ -44,7 +44,7 @@ export function formatBillDate(date) {
 }
 
 export const BILL_STORE = {
-  name: "TechZone",
+  name: "TechCart",
   email: CONTACT_EMAIL,
   phone: CONTACT_PHONE,
   address: CONTACT_ADDRESS,

@@ -114,7 +114,7 @@ export default function RegisterPage() {
           Create account
         </h1>
         <p className="section-subtitle text-center mb-6">
-          Join TechZone and start shopping. Customer ID is added at checkout.
+          Join TechCart and start shopping. Customer ID is added at checkout.
         </p>
 
         {error && <div className="alert-modern-error mb-4">{error}</div>}

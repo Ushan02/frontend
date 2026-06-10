@@ -43,7 +43,7 @@ const ORDER_API = import.meta.env.VITE_BACKEND_URL + "/api/order";
 
 const PAYMENT_API = import.meta.env.VITE_BACKEND_URL + "/api/payment";
 
-const PENDING_ORDER_KEY = "techzone_pending_order";
+const PENDING_ORDER_KEY = "techcart_pending_order";
 
 
 

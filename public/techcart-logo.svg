@@ -1,19 +1,20 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" fill="none" role="img" aria-label="TechZone">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 48" fill="none" role="img" aria-label="TechCart">
   <defs>
-    <linearGradient id="tzIconGrad" x1="4" y1="4" x2="44" y2="44" gradientUnits="userSpaceOnUse">
+    <linearGradient id="tcLogoGrad" x1="4" y1="4" x2="44" y2="44" gradientUnits="userSpaceOnUse">
       <stop stop-color="#0077b6"/>
       <stop offset="1" stop-color="#00b4d8"/>
     </linearGradient>
-    <linearGradient id="tzScreenGrad" x1="12" y1="14" x2="36" y2="30" gradientUnits="userSpaceOnUse">
+    <linearGradient id="tcLogoScreen" x1="12" y1="14" x2="36" y2="30" gradientUnits="userSpaceOnUse">
       <stop stop-color="#03045e"/>
       <stop offset="1" stop-color="#0077b6"/>
     </linearGradient>
   </defs>
-  <rect width="48" height="48" rx="12" fill="url(#tzIconGrad)"/>
-  <rect x="11" y="13" width="26" height="18" rx="3" fill="url(#tzScreenGrad)"/>
+  <rect width="48" height="48" rx="12" fill="url(#tcLogoGrad)"/>
+  <rect x="11" y="13" width="26" height="18" rx="3" fill="url(#tcLogoScreen)"/>
   <rect x="14" y="16" width="20" height="12" rx="1.5" fill="#90e0ef" opacity="0.35"/>
   <path stroke="#caf0f8" stroke-width="1.5" stroke-linecap="round" d="M17 22h8M21 18v8"/>
   <path stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" d="M27 19l4 3-4 3"/>
   <rect x="9" y="32" width="30" height="4" rx="2" fill="#ffffff" opacity="0.92"/>
   <rect x="20" y="36" width="8" height="2" rx="1" fill="#ffffff" opacity="0.55"/>
+  <text x="58" y="32" font-family="Inter, system-ui, -apple-system, Segoe UI, sans-serif" font-size="26" font-weight="800" fill="#ffffff" letter-spacing="-0.5">TechCart</text>
 </svg>

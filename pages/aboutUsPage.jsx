@@ -237,7 +237,7 @@ export default function AboutUsPage() {
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14 sm:py-20 text-center">
           <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/15 backdrop-blur-sm text-sm font-medium border border-white/20 mb-6">
             <HiOutlineSparkles className="w-4 h-4" />
-            About TechZone
+            About TechCart
           </span>
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold leading-tight mb-4 flex items-center justify-center gap-3 flex-wrap">
             <HiOutlineBuildingOffice2 className="w-9 h-9 sm:w-10 sm:h-10 shrink-0" />
@@ -256,7 +256,7 @@ export default function AboutUsPage() {
           <div>
             <h2 className="section-title mb-4">Our story</h2>
             <p className="text-base-content/70 leading-relaxed mb-4">
-              TechZone started with a simple idea: buying a laptop in Sri Lanka should feel clear,
+              TechCart started with a simple idea: buying a laptop in Sri Lanka should feel clear,
               not confusing. Too many stores hide specs, mix up pricing, or make it hard to compare
               gaming machines with everyday work notebooks.
             </p>
