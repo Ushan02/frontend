@@ -223,6 +223,8 @@ export default function CheckoutPage() {
 
           name: prev.name || `${profile.firstName} ${profile.lastName}`.trim(),
 
+          phone: prev.phone || profile.phone || "",
+
           customerId: profile.customerId || "",
 
         }));
