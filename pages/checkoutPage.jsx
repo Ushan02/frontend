@@ -35,6 +35,7 @@ import {
   CUSTOMER_ID_HINT,
   formatCustomerIdInput,
   isValidCustomerId,
+  normalizeCustomerId,
 } from "../src/lib/customerId";
 
 
@@ -122,6 +123,7 @@ export default function CheckoutPage() {
   const [error, setError] = useState("");
 
   const [orderSuccess, setOrderSuccess] = useState(null);
+  const [accountCustomerId, setAccountCustomerId] = useState(user?.customerId || "");
 
 
 
@@ -217,6 +219,8 @@ export default function CheckoutPage() {
 
         const profile = res.data;
 
+        setAccountCustomerId(profile.customerId || "");
+
         setForm((prev) => ({
 
           ...prev,
@@ -225,7 +229,7 @@ export default function CheckoutPage() {
 
           phone: prev.phone || profile.phone || "",
 
-          customerId: profile.customerId || "",
+          customerId: profile.customerId || prev.customerId || "",
 
         }));
 
@@ -379,12 +383,17 @@ export default function CheckoutPage() {
 
       const res = await axios.post(ORDER_API, payload, { headers: getAuthHeaders() });
 
-      const saveCustomerId = async () => {
+      const saveCustomerIdIfNew = async () => {
+        const existing = normalizeCustomerId(accountCustomerId || user?.customerId || "");
+        const submitted = normalizeCustomerId(form.customerId);
+        if (existing || !submitted) return;
+
         const profileRes = await axios.patch(
           `${import.meta.env.VITE_BACKEND_URL}/api/users/me/customer-id`,
-          { customerId: form.customerId },
+          { customerId: submitted },
           { headers: getAuthHeaders() }
         );
+        setAccountCustomerId(profileRes.data.customerId || submitted);
         const stored = getStoredUser();
         if (stored) {
           localStorage.setItem(
@@ -394,7 +403,11 @@ export default function CheckoutPage() {
         }
       };
 
-      await saveCustomerId();
+      try {
+        await saveCustomerIdIfNew();
+      } catch {
+        // Order already created — don't block checkout if ID was already on the account
+      }
 
       if (res.data.checkoutUrl) {
 
