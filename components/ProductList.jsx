@@ -63,24 +63,20 @@ export function ProductCard({ product, variant, compact = false }) {
 
   return (
     <article
-      className={`card card-bg group relative flex flex-col w-full min-w-0 transition-all duration-300 ${
+      className={`product-card card card-bg group relative flex flex-col w-full min-w-0 transition-all duration-300 ${
         compact
-          ? "p-2 sm:p-2.5 shadow-[0_8px_28px_rgba(3,4,94,0.12)] hover:shadow-[0_14px_40px_rgba(3,4,94,0.18)] hover:-translate-y-0.5"
-          : "p-2.5 sm:p-3 shadow-[0_10px_36px_rgba(3,4,94,0.13)] hover:shadow-[0_18px_52px_rgba(3,4,94,0.2)] hover:-translate-y-1"
+          ? "p-1.5 sm:p-2 shadow-[0_6px_22px_rgba(3,4,94,0.1)] hover:shadow-[0_10px_32px_rgba(3,4,94,0.15)] hover:-translate-y-0.5"
+          : "p-2 sm:p-2.5 shadow-[0_8px_28px_rgba(3,4,94,0.11)] hover:shadow-[0_12px_38px_rgba(3,4,94,0.16)] hover:-translate-y-0.5"
       }`}
     >
       {onSale && (
         <DiscountBadge
           percent={discount}
-          size={compact ? "sm" : "md"}
-          className={`absolute z-20 ${compact ? "top-2 right-2" : "top-3 right-3"}`}
+          size="sm"
+          className="absolute z-20 top-1.5 right-1.5 sm:top-2 sm:right-2"
         />
       )}
-      <div
-        className={`relative overflow-hidden bg-slate-50 border border-sky/30 ${
-          compact ? "aspect-[5/4] rounded-lg" : "aspect-[5/4] rounded-xl"
-        }`}
-      >
+      <div className="relative overflow-hidden bg-slate-50 border border-sky/30 aspect-[4/3] rounded-lg">
         <Link to={`/products/${product.productId}`} className="block h-full">
           {image ? (
             <img
@@ -92,76 +88,72 @@ export function ProductCard({ product, variant, compact = false }) {
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center text-base-content/20">
-              <HiOutlineShoppingBag className={compact ? "w-10 h-10" : "w-14 h-14"} />
+              <HiOutlineShoppingBag className={compact ? "w-8 h-8" : "w-10 h-10"} />
             </div>
           )}
         </Link>
 
         {!compact && (
-          <div className="absolute bottom-2 right-2 flex gap-1.5 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
+          <div className="absolute bottom-1.5 right-1.5 flex gap-1 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
             <Link
               to={`/products/${product.productId}`}
-              className="flex items-center justify-center w-8 h-8 rounded-full bg-white/95 text-base-content shadow-lg"
+              className="flex items-center justify-center w-7 h-7 rounded-full bg-white/95 text-base-content shadow-md"
             >
-              <HiOutlineEye className="w-4 h-4" />
+              <HiOutlineEye className="w-3.5 h-3.5" />
             </Link>
             <button
               type="button"
               onClick={handleQuickAdd}
               disabled={!canBuy}
-              className="flex items-center justify-center w-8 h-8 rounded-full bg-primary text-primary-content shadow-lg disabled:opacity-50"
+              className="flex items-center justify-center w-7 h-7 rounded-full bg-primary text-primary-content shadow-md disabled:opacity-50"
             >
-              <HiOutlineShoppingCart className="w-4 h-4" />
+              <HiOutlineShoppingCart className="w-3.5 h-3.5" />
             </button>
           </div>
         )}
       </div>
 
-      <div className={`flex flex-col flex-1 ${compact ? "gap-1 pt-2 px-0.5" : "gap-1.5 px-0.5 pt-2.5"}`}>
-        <p className="font-semibold text-primary/80 uppercase tracking-widest text-xs sm:text-[10px]">
+      <div className={`flex flex-col flex-1 ${compact ? "gap-0.5 pt-1.5 px-0.5" : "gap-1 px-0.5 pt-2"}`}>
+        <p className="product-card-brand font-semibold text-primary/80 uppercase tracking-wider text-[10px]">
           {product.brand}
         </p>
         <Link to={`/products/${product.productId}`}>
-          <h2
-            className={`font-bold group-hover:text-primary transition-colors line-clamp-2 ${
-              compact ? "text-sm sm:text-sm" : "text-base sm:text-base"
-            }`}
-          >
+          <h2 className="product-card-title font-semibold group-hover:text-primary transition-colors line-clamp-2 text-xs sm:text-sm leading-snug">
             {product.productName}
           </h2>
         </Link>
 
-        <p className="text-xs sm:text-[10px] text-base-content/45 uppercase tracking-wide line-clamp-1">
+        <p className="product-card-meta text-[10px] text-base-content/45 uppercase tracking-wide line-clamp-1">
           {getSubCategoryLabel(product.subCategory)}
         </p>
 
         {showGamingSpecs && (
-          <p className="text-xs sm:text-[11px] text-base-content/60 line-clamp-1">
+          <p className="product-card-meta text-[10px] sm:text-[11px] text-base-content/60 line-clamp-1">
             {specs.processorModel}
             {specs.gpuModel ? ` · ${specs.gpuModel}` : ""}
           </p>
         )}
 
         {showBusinessSpecs && (
-          <p className="text-xs sm:text-[11px] text-base-content/60 line-clamp-1">
+          <p className="product-card-meta text-[10px] sm:text-[11px] text-base-content/60 line-clamp-1">
             {specs.processorModel}
             {specs.ram ? ` · ${specs.ram}GB RAM` : ""}
           </p>
         )}
 
         {!compact && (
-          <p className="text-xs sm:text-[10px] text-base-content/55 flex items-center gap-1">
-            <HiOutlineShieldCheck className="w-3.5 h-3.5 text-primary shrink-0" />
+          <p className="product-card-meta text-[10px] text-base-content/55 flex items-center gap-1">
+            <HiOutlineShieldCheck className="w-3 h-3 text-primary shrink-0" />
             Warranty: {warranty}
           </p>
         )}
 
-        <div className={`flex items-baseline flex-wrap mt-auto ${compact ? "gap-1 pt-1" : "gap-1.5 pt-1.5"}`}>
-            <span className={compact ? "text-base font-extrabold text-primary" : "text-lg sm:text-lg font-extrabold text-primary"}>
+        <div className={`flex items-baseline flex-wrap mt-auto ${compact ? "gap-1 pt-0.5" : "gap-1 pt-1"}`}>
+            <span className="product-card-price text-sm sm:text-base font-extrabold text-primary">
               {formatPrice(product.price)}
             </span>
             {onSale && (
-              <span className={compact ? "text-xs text-base-content/40 line-through" : "text-sm text-base-content/40 line-through"}>
+              <span className="product-card-price-old text-[10px] sm:text-xs text-base-content/40 line-through">
                 {formatPrice(product.labeledPrice)}
               </span>
             )}
@@ -171,7 +163,7 @@ export function ProductCard({ product, variant, compact = false }) {
           type="button"
           onClick={handleQuickAdd}
           disabled={!canBuy}
-          className={`btn btn-primary mt-0.5 ${compact ? "btn-xs rounded-lg min-h-7 h-7 text-xs" : "btn-xs sm:btn-sm rounded-lg min-h-8 h-8 text-xs sm:text-sm"}`}
+          className="product-card-btn btn btn-primary btn-xs rounded-lg min-h-6 h-6 sm:min-h-7 sm:h-7 text-[10px] sm:text-xs mt-0.5 px-2"
         >
           {outOfStock ? "Sold out" : "ADD TO CART"}
         </button>
@@ -346,7 +338,7 @@ export default function ProductList({ category, subCategory, filters, search = "
         {totalPages > 1 && ` · Page ${page} of ${totalPages}`}
       </p>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
+      <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-2.5 sm:gap-3 md:gap-4">
         {products.map((product) => (
           <ProductCard
             key={product._id}
