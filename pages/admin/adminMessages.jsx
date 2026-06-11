@@ -7,6 +7,10 @@ import {
   HiOutlineCheck,
 } from "react-icons/hi2";
 import { API_BASE, getAuthHeaders } from "../../src/lib/adminApi";
+import {
+  markAllMessagesRead,
+  notifyAdminNotificationsUpdated,
+} from "../../src/lib/adminNotifications";
 
 const API = API_BASE + "/api/contact";
 
@@ -25,6 +29,14 @@ export default function AdminMessages() {
       setMessages(list);
       if (list.length > 0 && !selectedId) {
         setSelectedId(list[0]._id);
+      }
+      if (list.some((m) => !m.isRead)) {
+        try {
+          await markAllMessagesRead();
+          setMessages((prev) => prev.map((m) => ({ ...m, isRead: true })));
+        } catch {
+          /* keep list; badges update on next refresh */
+        }
       }
     } catch (err) {
       setError(err.response?.data?.message || "Failed to load messages.");
@@ -46,6 +58,7 @@ export default function AdminMessages() {
       setMessages((prev) =>
         prev.map((m) => (m._id === id ? { ...m, isRead: true } : m))
       );
+      notifyAdminNotificationsUpdated();
     } catch (err) {
       alert(err.response?.data?.message || "Failed to mark as read.");
     }

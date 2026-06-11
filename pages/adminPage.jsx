@@ -22,18 +22,31 @@ import AdminOrders from "./admin/adminOrders";
 import AdminReviews from "./admin/adminReviews";
 import AdminMessages from "./admin/adminMessages";
 import AdminRepairs from "./admin/adminRepairs";
+import {
+  ADMIN_NOTIFICATIONS_EVENT,
+  fetchAdminUnreadCounts,
+} from "../src/lib/adminNotifications";
 
 const navItems = [
-  { to: "/admin", label: "Dashboard", Icon: HiOutlineHome, end: true },
-  { to: "/admin/products", label: "Products", Icon: HiOutlineCube },
-  { to: "/admin/users", label: "Users", Icon: HiOutlineUsers },
-  { to: "/admin/orders", label: "Orders", Icon: HiOutlineShoppingCart },
-  { to: "/admin/repairs", label: "Repairs", Icon: HiOutlineWrenchScrewdriver },
-  { to: "/admin/reviews", label: "Reviews", Icon: HiOutlineStar },
-  { to: "/admin/messages", label: "Messages", Icon: HiOutlineChatBubbleLeftRight },
+  { to: "/admin", label: "Dashboard", Icon: HiOutlineHome, end: true, badgeKey: null },
+  { to: "/admin/products", label: "Products", Icon: HiOutlineCube, badgeKey: null },
+  { to: "/admin/users", label: "Users", Icon: HiOutlineUsers, badgeKey: null },
+  { to: "/admin/orders", label: "Orders", Icon: HiOutlineShoppingCart, badgeKey: null },
+  { to: "/admin/repairs", label: "Repairs", Icon: HiOutlineWrenchScrewdriver, badgeKey: null },
+  { to: "/admin/reviews", label: "Reviews", Icon: HiOutlineStar, badgeKey: "reviews" },
+  { to: "/admin/messages", label: "Messages", Icon: HiOutlineChatBubbleLeftRight, badgeKey: "messages" },
 ];
 
-function SidebarLink({ to, label, Icon, end, onNavigate }) {
+function UnreadBadge({ count }) {
+  if (!count || count <= 0) return null;
+  return (
+    <span className="min-w-[1.25rem] h-5 px-1.5 rounded-full bg-red-500 text-white text-[10px] font-bold flex items-center justify-center">
+      {count > 99 ? "99+" : count}
+    </span>
+  );
+}
+
+function SidebarLink({ to, label, Icon, end, onNavigate, badge = 0 }) {
   return (
     <NavLink
       to={to}
@@ -48,7 +61,8 @@ function SidebarLink({ to, label, Icon, end, onNavigate }) {
       }
     >
       <Icon className="w-5 h-5 shrink-0" />
-      {label}
+      <span className="flex-1">{label}</span>
+      <UnreadBadge count={badge} />
     </NavLink>
   );
 }
@@ -56,6 +70,7 @@ function SidebarLink({ to, label, Icon, end, onNavigate }) {
 export default function AdminPage() {
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [unread, setUnread] = useState({ unreadMessages: 0, unreadReviews: 0 });
 
   const user = (() => {
     try {
@@ -69,6 +84,24 @@ export default function AdminPage() {
   useEffect(() => {
     setSidebarOpen(false);
   }, [location.pathname]);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetchAdminUnreadCounts().then((counts) => {
+      if (!cancelled) setUnread(counts);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [location.pathname]);
+
+  useEffect(() => {
+    const refresh = () => {
+      fetchAdminUnreadCounts().then(setUnread);
+    };
+    window.addEventListener(ADMIN_NOTIFICATIONS_EVENT, refresh);
+    return () => window.removeEventListener(ADMIN_NOTIFICATIONS_EVENT, refresh);
+  }, []);
 
   useEffect(() => {
     document.body.style.overflow = sidebarOpen ? "hidden" : "";
@@ -95,7 +128,21 @@ export default function AdminPage() {
 
       <nav className="flex flex-col gap-1 p-4 flex-1 overflow-y-auto min-h-0">
         {navItems.map((item) => (
-          <SidebarLink key={item.to} {...item} onNavigate={closeSidebar} />
+          <SidebarLink
+            key={item.to}
+            to={item.to}
+            label={item.label}
+            Icon={item.Icon}
+            end={item.end}
+            onNavigate={closeSidebar}
+            badge={
+              item.badgeKey === "messages"
+                ? unread.unreadMessages
+                : item.badgeKey === "reviews"
+                  ? unread.unreadReviews
+                  : 0
+            }
+          />
         ))}
       </nav>
 

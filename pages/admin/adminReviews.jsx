@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import axios from "axios";
 import { HiOutlineStar, HiOutlineTrash } from "react-icons/hi2";
 import { API_BASE, getAuthHeaders } from "../../src/lib/adminApi";
+import { markAllReviewsRead } from "../../src/lib/adminNotifications";
 
 const API = API_BASE + "/api/review";
 
@@ -31,7 +32,16 @@ export default function AdminReviews() {
     setError("");
     try {
       const res = await axios.get(API, { headers: getAuthHeaders() });
-      setReviews(Array.isArray(res.data) ? res.data : []);
+      const list = Array.isArray(res.data) ? res.data : [];
+      setReviews(list);
+      if (list.some((r) => !r.isRead)) {
+        try {
+          await markAllReviewsRead();
+          setReviews((prev) => prev.map((r) => ({ ...r, isRead: true })));
+        } catch {
+          /* keep list; badges update on next refresh */
+        }
+      }
     } catch (err) {
       setError(err.response?.data?.message || "Failed to load reviews.");
     } finally {
@@ -105,7 +115,10 @@ export default function AdminReviews() {
             </thead>
             <tbody className="divide-y divide-slate-100">
               {reviews.map((review) => (
-                <tr key={review._id} className="hover:bg-slate-50">
+                <tr
+                  key={review._id}
+                  className={`hover:bg-slate-50 ${!review.isRead ? "bg-amber-50/60" : ""}`}
+                >
                   <td className="px-5 py-3.5 text-sm font-mono text-blue-600 whitespace-nowrap">
                     {review.productId ? (
                       <Link
