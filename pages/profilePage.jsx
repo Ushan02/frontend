@@ -6,7 +6,7 @@ import {
   HiOutlineIdentification,
   HiOutlinePhone,
 } from "react-icons/hi2";
-import { API_USERS, saveSession } from "../src/lib/auth";
+import { API_USERS, formatAuthError, saveSession } from "../src/lib/auth";
 import { getAuthHeaders } from "../src/lib/adminApi";
 import {
   CUSTOMER_ID_HINT,
@@ -56,7 +56,12 @@ export default function ProfilePage() {
         });
       } catch (err) {
         if (!cancelled) {
-          setError(err.response?.data?.message || "Failed to load your profile.");
+          const status = err.response?.status;
+          if (status === 404) {
+            setError("Profile API not found. Redeploy the backend on Render with the latest code.");
+          } else {
+            setError(formatAuthError(err, "Failed to load your profile."));
+          }
         }
       } finally {
         if (!cancelled) setLoading(false);
@@ -123,7 +128,12 @@ export default function ProfilePage() {
       saveSession({ token: res.data.token, user: res.data.user });
       setSuccess(res.data.message || "Profile updated.");
     } catch (err) {
-      setError(err.response?.data?.message || "Failed to update profile.");
+      const status = err.response?.status;
+      if (status === 404) {
+        setError("Profile update API not found. Redeploy the backend on Render with the latest code.");
+      } else {
+        setError(formatAuthError(err, "Failed to update profile."));
+      }
     } finally {
       setSaving(false);
     }

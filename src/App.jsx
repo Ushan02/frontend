@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate, Outlet } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, Navigate, Outlet, useLocation } from 'react-router-dom'
 import './App.css'
 import Header from '../components/header'
 import Footer from '../components/footer'
@@ -16,6 +16,7 @@ import CheckoutPage from '../pages/checkoutPage'
 import CheckoutSuccessPage from '../pages/checkoutSuccessPage'
 import AboutUsPage from '../pages/aboutUsPage'
 import PurchaseHistoryPage from '../pages/purchaseHistoryPage'
+import ProfilePage from '../pages/profilePage'
 import { CartProvider } from './context/CartContext'
 
 // Safely parse stored user
@@ -40,11 +41,12 @@ function AdminRoute({ children }) {
 
 // Customer-only routes — redirect to login if not signed in
 function AuthRoute({ children }) {
+  const location = useLocation();
   const token = localStorage.getItem("token");
   const user  = getStoredUser();
 
   if (!token || !user) {
-    return <Navigate to="/login" replace state={{ from: "/my-orders" }} />;
+    return <Navigate to="/login" replace state={{ from: location.pathname }} />;
   }
   return children;
 }
@@ -100,6 +102,7 @@ function App() {
             <Route path="/cart" element={<CartPage />} />
             <Route path="/checkout" element={<CheckoutPage />} />
             <Route path="/checkout/success" element={<CheckoutSuccessPage />} />
+            <Route path="/profile" element={<AuthRoute><ProfilePage /></AuthRoute>} />
             <Route path="/my-orders" element={<AuthRoute><PurchaseHistoryPage /></AuthRoute>} />
             <Route path="/login" element={<GuestRoute><LoginPage /></GuestRoute>} />
             <Route path="/register" element={<GuestRoute><RegisterPage /></GuestRoute>} />
