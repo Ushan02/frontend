@@ -16,7 +16,7 @@ import { getDiscountPercent } from "../src/lib/discount";
 import { getSubCategoryLabel, getDefaultWarranty } from "../src/lib/productCategories";
 
 const API = import.meta.env.VITE_BACKEND_URL + "/api/products";
-const PAGE_SIZE = 9;
+const PAGE_SIZE = 12;
 
 function buildQueryParams(category, subCategory, filters, page, search) {
   const params = { page, limit: PAGE_SIZE };

@@ -16,7 +16,8 @@ import {
 import { ProductCard } from "../components/ProductList";
 
 const PRODUCTS_API = import.meta.env.VITE_BACKEND_URL + "/api/products";
-const FEATURED_LIMIT = 6;
+const LAPTOP_FEATURED_LIMIT = 4;
+const ACCESSORY_FEATURED_LIMIT = 4;
 
 const categories = [
   {
@@ -89,8 +90,59 @@ const heroLaptops = [
   },
 ];
 
+function ProductCardSkeleton({ count }) {
+  return (
+    <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5 sm:gap-3 md:gap-4">
+      {Array.from({ length: count }).map((_, i) => (
+        <div
+          key={i}
+          className="rounded-xl card-bg p-2 sm:p-2.5 shadow-[0_8px_28px_rgba(3,4,94,0.11)] animate-pulse"
+        >
+          <div className="aspect-[4/3] rounded-lg bg-base-300 mb-2" />
+          <div className="h-2 w-12 bg-base-300 rounded mb-1" />
+          <div className="h-3 w-full bg-base-300 rounded mb-1" />
+          <div className="h-2.5 w-2/3 bg-base-300 rounded mb-1.5" />
+          <div className="h-6 w-full bg-base-300 rounded-lg" />
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function FeaturedProductGroup({ title, icon: Icon, products, viewAllLink }) {
+  if (products.length === 0) return null;
+
+  return (
+    <div className="mb-10 sm:mb-12 last:mb-0">
+      <div className="flex items-center justify-between gap-3 mb-4 sm:mb-5">
+        <h3 className="text-base sm:text-lg font-bold text-base-content flex items-center gap-2">
+          {Icon && <Icon className="w-5 h-5 text-primary shrink-0" />}
+          {title}
+        </h3>
+        <Link
+          to={viewAllLink}
+          className="inline-flex items-center gap-1 text-xs sm:text-sm font-semibold text-primary hover:gap-2 transition-all shrink-0"
+        >
+          View all
+          <HiOutlineArrowRight className="w-3.5 h-3.5" />
+        </Link>
+      </div>
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5 sm:gap-3 md:gap-4">
+        {products.map((product) => (
+          <ProductCard
+            key={product._id}
+            product={product}
+            variant={product.subCategory || "all"}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function FeaturedProductsSection() {
-  const [products, setProducts] = useState([]);
+  const [laptops, setLaptops] = useState([]);
+  const [accessories, setAccessories] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -100,15 +152,25 @@ function FeaturedProductsSection() {
       try {
         const token = localStorage.getItem("token");
         const headers = token ? { Authorization: `Bearer ${token}` } : {};
-        const res = await axios.get(PRODUCTS_API, {
-          headers,
-          params: { page: 1, limit: FEATURED_LIMIT },
-        });
+        const [laptopsRes, accessoriesRes] = await Promise.all([
+          axios.get(PRODUCTS_API, {
+            headers,
+            params: { page: 1, limit: LAPTOP_FEATURED_LIMIT, category: "laptop" },
+          }),
+          axios.get(PRODUCTS_API, {
+            headers,
+            params: { page: 1, limit: ACCESSORY_FEATURED_LIMIT, category: "accessories" },
+          }),
+        ]);
         if (!cancelled) {
-          setProducts(res.data.products || []);
+          setLaptops(laptopsRes.data.products || []);
+          setAccessories(accessoriesRes.data.products || []);
         }
       } catch {
-        if (!cancelled) setProducts([]);
+        if (!cancelled) {
+          setLaptops([]);
+          setAccessories([]);
+        }
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -119,6 +181,8 @@ function FeaturedProductsSection() {
       cancelled = true;
     };
   }, []);
+
+  const hasProducts = laptops.length > 0 || accessories.length > 0;
 
   return (
     <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
@@ -145,21 +209,11 @@ function FeaturedProductsSection() {
       </div>
 
       {loading ? (
-        <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-2.5 sm:gap-3 md:gap-4">
-          {Array.from({ length: FEATURED_LIMIT }).map((_, i) => (
-            <div
-              key={i}
-              className="rounded-xl card-bg p-2 sm:p-2.5 shadow-[0_8px_28px_rgba(3,4,94,0.11)] animate-pulse"
-            >
-              <div className="aspect-[4/3] rounded-lg bg-base-300 mb-2" />
-              <div className="h-2 w-12 bg-base-300 rounded mb-1" />
-              <div className="h-3 w-full bg-base-300 rounded mb-1" />
-              <div className="h-2.5 w-2/3 bg-base-300 rounded mb-1.5" />
-              <div className="h-6 w-full bg-base-300 rounded-lg" />
-            </div>
-          ))}
+        <div className="space-y-10">
+          <ProductCardSkeleton count={LAPTOP_FEATURED_LIMIT} />
+          <ProductCardSkeleton count={ACCESSORY_FEATURED_LIMIT} />
         </div>
-      ) : products.length === 0 ? (
+      ) : !hasProducts ? (
         <div className="text-center py-12 rounded-3xl card-bg border border-base-300/50">
           <HiOutlineShoppingBag className="w-12 h-12 mx-auto text-base-content/20 mb-3" />
           <p className="text-base-content/60 text-sm">No products yet. Check back soon!</p>
@@ -168,15 +222,20 @@ function FeaturedProductsSection() {
           </Link>
         </div>
       ) : (
-        <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-2.5 sm:gap-3 md:gap-4">
-          {products.map((product) => (
-            <ProductCard
-              key={product._id}
-              product={product}
-              variant={product.subCategory || "all"}
-            />
-          ))}
-        </div>
+        <>
+          <FeaturedProductGroup
+            title="Laptops"
+            icon={HiOutlineCpuChip}
+            products={laptops}
+            viewAllLink="/products"
+          />
+          <FeaturedProductGroup
+            title="Accessories"
+            icon={HiOutlineDeviceTablet}
+            products={accessories}
+            viewAllLink="/products?section=accessories"
+          />
+        </>
       )}
     </section>
   );
