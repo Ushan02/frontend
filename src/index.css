@@ -228,6 +228,26 @@ body,
   width: 100%;
   max-width: 26rem;
   padding: clamp(1.5rem, 4vw, 2rem);
+  overflow: visible;
+}
+
+.google-signin-wrap {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  min-width: 0;
+  overflow: visible;
+}
+
+.google-signin-wrap > div {
+  width: 100% !important;
+  max-width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.google-signin-wrap iframe {
+  max-width: 100% !important;
 }
 
 /* ─── Forms ─── */

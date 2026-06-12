@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
-import { GoogleLogin } from "@react-oauth/google";
+import GoogleSignInButton from "../components/GoogleSignInButton";
 import { HiOutlineUserPlus } from "react-icons/hi2";
 import { useCart } from "../src/context/CartContext";
 import {
@@ -120,15 +120,11 @@ export default function RegisterPage() {
         {error && <div className="alert-modern-error mb-4">{error}</div>}
 
         {GOOGLE_CLIENT_ID && (
-          <div className="mb-6 flex justify-center">
-            <GoogleLogin
+          <div className="mb-6">
+            <GoogleSignInButton
               onSuccess={handleGoogleSuccess}
               onError={() => setError("Google sign-in was cancelled or failed.")}
-              theme="outline"
-              size="large"
               text="signup_with"
-              shape="rectangular"
-              width="320"
             />
           </div>
         )}
